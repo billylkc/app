@@ -12,12 +12,12 @@ import (
 // dailyProductsCmd represents the dailyProducts command
 var dailyProductCmd = &cobra.Command{
 	Use:     "products",
-	Short:   "Daily products",
-	Long:    `Daily products`,
+	Short:   "Daily products.",
+	Long:    `Daily products.`,
 	Aliases: []string{"p"},
 	Example: `  app daily products -d "2020-03-25"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		res, err := calc.GetDailyProduct(date, 1)
+		res, err := calc.GetDailyProduct(date, 0)
 		if err != nil {
 			return err
 		}

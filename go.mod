@@ -3,6 +3,7 @@ module github.com/billylkc/app
 go 1.16
 
 require (
+	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0

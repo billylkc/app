@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ProductRecord as daily sales for
+// ProductRecord as sales record for differernt products
 type ProductRecord struct {
 	Date        time.Time
 	Category    string
@@ -28,8 +28,8 @@ func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
 	if err != nil {
 		return records, err
 	}
-	dd := t.AddDate(0, 0, -n).Format("2006-01-02") // start date
-	d = t.AddDate(0, 0, 1).Format("2006-01-02")    // end date
+	start := t.AddDate(0, 0, -n).Format("2006-01-02") // start date
+	end := t.AddDate(0, 0, 1).Format("2006-01-02")    // end date
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -84,7 +84,7 @@ func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
     GROUP BY op.OrderDate, pc.category_name, op.product_id, p.product_name
     ORDER BY OrderDate desc, pc.category_name, op.product_id
     `
-	query := fmt.Sprintf(queryF, dd, d)
+	query := fmt.Sprintf(queryF, start, end)
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {

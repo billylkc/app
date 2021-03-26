@@ -19,5 +19,10 @@ func GetConnection() (*sql.DB, error) {
 	if err != nil {
 		return db, errors.Wrap(err, "unable to connect to mysql")
 	}
-	return db, err
+	err = db.Ping()
+
+	if err != nil {
+		return db, fmt.Errorf("Probably ssh tunnel to database is not being set.\n%v\n", err)
+	}
+	return db, nil
 }
