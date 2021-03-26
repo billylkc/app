@@ -10,16 +10,16 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Daily as daily sales for
-type Daily struct {
+// SalesRecord as daily sales for
+type SalesRecord struct {
 	Date  time.Time
 	Count int
 	Total float64
 }
 
 // GetDailySales returns the latest sales record for the past n days
-func GetDailySales(d string, n int) ([]Daily, error) {
-	var records []Daily
+func GetDailySales(d string, n int) ([]SalesRecord, error) {
+	var records []SalesRecord
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -57,7 +57,7 @@ func GetDailySales(d string, n int) ([]Daily, error) {
 	}
 
 	for results.Next() {
-		var rec Daily
+		var rec SalesRecord
 		err = results.Scan(&rec.Date, &rec.Count, &rec.Total)
 		if err != nil {
 			panic(err.Error()) // proper error handling instead of panic in your app

@@ -1,9 +1,11 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
 	"time"
 
+	"github.com/billylkc/app/calc"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +17,29 @@ var dailyProductCmd = &cobra.Command{
 	Aliases: []string{"p"},
 	Example: `  app daily products -d "2020-03-25"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("product called")
+		res, err := calc.GetDailyProduct(date, 1)
+		if err != nil {
+			return err
+		}
+
+		// Display table
+		rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.AppendHeader(table.Row{"Date", "Cateogry", "ID", "Product Name", "Quantity", "Total"})
+		for _, r := range res {
+			date := r.Date.Format("2006-01-02")
+			t.AppendRow(table.Row{date, r.Category, r.ProductID, r.ProductName, r.Quantity, r.Total}, rowConfigAutoMerge)
+		}
+		t.SetColumnConfigs([]table.ColumnConfig{
+			{Number: 1, AutoMerge: true},
+			{Number: 2, AutoMerge: true},
+			{Number: 3, AutoMerge: true},
+		})
+		t.AppendSeparator()
+		t.Style().Options.SeparateRows = true
+		t.Render()
+
 		return nil
 	},
 }
