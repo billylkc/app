@@ -27,7 +27,7 @@ var dailyMembersCmd = &cobra.Command{
 		rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.AppendHeader(table.Row{"Date", "Username", "Total", "Average", "GrandTotal"})
+		t.AppendHeader(table.Row{"Date", "Username", "DayTotal", "Average", "GrandTotal"})
 		for _, r := range res {
 			date := r.Date.Format("2006-01-02")
 			t.AppendRow(table.Row{date, r.Username, humanize.Comma(int64(r.Total)), humanize.Comma(int64(r.Average)), humanize.Comma(int64(r.GrandTotal))}, rowConfigAutoMerge)
