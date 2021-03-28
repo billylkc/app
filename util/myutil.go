@@ -1,13 +1,36 @@
 package app
 
 import (
+	"fmt"
 	"os"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/dustin/go-humanize"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
+
+// ParseDateInput parse the input for past n days, or actual day string in YYYY-MM-DD format
+func ParseDateInput(s string) (string, error) {
+	var res string
+
+	// Check if input is in YYYY-MM-DD format
+	if len(s) == 10 {
+		// TODO: Check for pattern
+		return s, nil
+	}
+
+	// Convert to date
+	d, err := strconv.Atoi(s)
+	d = d - 1
+	if err != nil {
+		return res, fmt.Errorf("Invalid input for date. Need a date in YYYY-MM-DD format or number for past n days")
+	}
+	res = time.Now().AddDate(0, 0, -d).Format("2006-01-02")
+	fmt.Println(res)
+	return res, nil
+}
 
 // InterfaceSlice converts a list of struct to list of interface
 func InterfaceSlice(slice interface{}) []interface{} {

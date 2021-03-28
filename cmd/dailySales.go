@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
@@ -17,28 +16,16 @@ var dailySalesCmd = &cobra.Command{
 	Aliases: []string{"s"},
 	Example: `  app daily sales -d "2021-03-24"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		res, err := calc.GetDailySales(date, 7)
+		d, err := util.ParseDateInput(date)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 
-		// Display table
-		// rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
-		// t := table.NewWriter()
-		// t.SetOutputMirror(os.Stdout)
-		// t.AppendHeader(table.Row{"Date", "Count", "Total"})
-		// for _, r := range res {
-		// 	date := r.Date.Format("2006-01-02")
-		// 	t.AppendRow(table.Row{date, r.Count, r.Total}, rowConfigAutoMerge)
-		// }
-		// t.SetColumnConfigs([]table.ColumnConfig{
-		// 	{Number: 1, AutoMerge: true},
-		// 	{Number: 2, AutoMerge: true},
-		// 	{Number: 3, AutoMerge: true},
-		// })
-		// t.AppendSeparator()
-		// t.Style().Options.SeparateRows = true
-		// t.Render()
+		res, err := calc.GetDailySales(d, 7)
+		if err != nil {
+			return err
+		}
+
 		headers := []string{"Date", "Count", "Total"}
 		data := util.InterfaceSlice(res)
 		err = util.PrintTable(data, headers, 3)
