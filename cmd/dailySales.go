@@ -2,11 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/billylkc/app/calc"
-	"github.com/jedib0t/go-pretty/v6/table"
+	util "github.com/billylkc/app/util"
 	"github.com/spf13/cobra"
 )
 
@@ -24,23 +23,28 @@ var dailySalesCmd = &cobra.Command{
 		}
 
 		// Display table
-		rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
-		t := table.NewWriter()
-		t.SetOutputMirror(os.Stdout)
-		t.AppendHeader(table.Row{"Date", "Count", "Total"})
-		for _, r := range res {
-			date := r.Date.Format("2006-01-02")
-			t.AppendRow(table.Row{date, r.Count, r.Total}, rowConfigAutoMerge)
+		// rowConfigAutoMerge := table.RowConfig{AutoMerge: true}
+		// t := table.NewWriter()
+		// t.SetOutputMirror(os.Stdout)
+		// t.AppendHeader(table.Row{"Date", "Count", "Total"})
+		// for _, r := range res {
+		// 	date := r.Date.Format("2006-01-02")
+		// 	t.AppendRow(table.Row{date, r.Count, r.Total}, rowConfigAutoMerge)
+		// }
+		// t.SetColumnConfigs([]table.ColumnConfig{
+		// 	{Number: 1, AutoMerge: true},
+		// 	{Number: 2, AutoMerge: true},
+		// 	{Number: 3, AutoMerge: true},
+		// })
+		// t.AppendSeparator()
+		// t.Style().Options.SeparateRows = true
+		// t.Render()
+		headers := []string{"Date", "Count", "Total"}
+		data := util.InterfaceSlice(res)
+		err = util.PrintTable(data, headers, 3)
+		if err != nil {
+			return err
 		}
-		t.SetColumnConfigs([]table.ColumnConfig{
-			{Number: 1, AutoMerge: true},
-			{Number: 2, AutoMerge: true},
-			{Number: 3, AutoMerge: true},
-		})
-		t.AppendSeparator()
-		t.Style().Options.SeparateRows = true
-		t.Render()
-
 		return nil
 	},
 }
