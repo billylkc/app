@@ -75,7 +75,70 @@ func GetDailySales(d string, n int) ([]SalesRecord, error) {
 	return records, nil
 }
 
-// GetMonthsSales returns the latest sales record for the past n days
+// GetWeeklySales returns the latest sales record for the past n weeks
+func GetWeeklySales(d string, n int) ([]SalesRecord, error) {
+	var records []SalesRecord
+
+	// Parse start end date
+	t, err := now.Parse(d)
+	if err != nil {
+		return records, err
+	}
+	end := now.With(t).Format("2006-01-02")
+	start := t.AddDate(0, 0, -n*7).Format("2006-01-02")
+
+	db, err := database.GetConnection()
+	if err != nil {
+		return records, err
+	}
+
+	queryF := `
+SELECT
+    DATE,
+	COUNT(1),
+	SUM(TOTAL) as TOTAL
+FROM
+    (SELECT
+		CAST(SUBDATE(created_date, WEEKDAY(created_date)) AS DATE) AS DATE,
+        TOTAL
+    FROM %s as op
+	ORDER BY order_id desc
+	) as oop
+WHERE DATE >= '%s' AND DATE <= '%s'
+GROUP BY
+	DATE
+ORDER BY DATE DESC
+	`
+
+	query := fmt.Sprintf(queryF,
+		"`order`",
+		start,
+		end)
+
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return records, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var rec SalesRecord
+		err = results.Scan(&rec.Date, &rec.Count, &rec.Total)
+		if err != nil {
+			panic(err.Error()) // proper error handling instead of panic in your app
+		}
+		records = append(records, rec)
+	}
+
+	// Sort the stupid slice, desc
+	sort.Slice(records, func(i, j int) bool {
+		return records[j].Date.Before(records[i].Date)
+	})
+
+	return records, nil
+}
+
+// GetMonthlySales returns the latest sales record for the past n months
 func GetMonthlySales(d string, n int) ([]SalesRecord, error) {
 	var records []SalesRecord
 

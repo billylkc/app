@@ -31,7 +31,7 @@ var mMembersCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		headers := []string{"Date", "Username", "MonthlyTotal", "Average", "GrandTotal"}
+		headers := []string{"Date", "Username", "Monthly_Total", "Average", "Grand_Total"}
 		ignores := []string{"ID"}
 		data := util.InterfaceSlice(res)
 		err = util.PrintTable(data, headers, ignores, 1)
