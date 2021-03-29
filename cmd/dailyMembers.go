@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// dailyMembersCmd represents the dailyMembers command
-var dailyMembersCmd = &cobra.Command{
+// dMembersCmd represents the daily members command
+var dMembersCmd = &cobra.Command{
 	Use:     "members",
 	Short:   "Daily member spending.",
 	Long:    `Daily member spending.`,
@@ -21,7 +21,7 @@ var dailyMembersCmd = &cobra.Command{
 			date = args[0]
 		}
 
-		d, err := util.ParseDateInput(date)
+		d, err := util.ParseDateInput(date, "d")
 		if err != nil {
 			return err
 		}
@@ -43,6 +43,6 @@ var dailyMembersCmd = &cobra.Command{
 
 func init() {
 	today := time.Now().Format("2006-01-02")
-	dailyCmd.AddCommand(dailyMembersCmd)
-	dailyMembersCmd.Flags().StringVarP(&date, "date", "d", today, "Start date of query")
+	dCmd.AddCommand(dMembersCmd)
+	dMembersCmd.Flags().StringVarP(&date, "date", "d", today, "Start date of query")
 }

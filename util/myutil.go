@@ -13,7 +13,8 @@ import (
 )
 
 // ParseDateInput parse the input for past n days, or actual day string in YYYY-MM-DD format
-func ParseDateInput(s string) (string, error) {
+// result depends on freq, daily, monthly -> 2021-03-01, weekly(TODO)
+func ParseDateInput(s, freq string) (string, error) {
 	var res string
 
 	// Check if input is in YYYY-MM-DD format
@@ -27,7 +28,15 @@ func ParseDateInput(s string) (string, error) {
 	if err != nil {
 		return res, fmt.Errorf("Invalid input for date. Need a date in YYYY-MM-DD format or number for past n days")
 	}
-	res = time.Now().AddDate(0, 0, -d).Format("2006-01-02")
+	switch freq {
+	case "d": // Daily
+		res = time.Now().AddDate(0, 0, -d).Format("2006-01-02")
+	case "m": //Monthly
+		res = "2021-03-01"
+	default:
+		res = time.Now().Format("2006-01-02")
+	}
+
 	return res, nil
 }
 

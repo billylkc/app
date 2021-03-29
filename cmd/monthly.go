@@ -6,11 +6,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var dCmd = &cobra.Command{
-	Use:     "daily",
-	Short:   "Collection of daily query",
-	Long:    `Collection of daily query`,
-	Aliases: []string{"d"},
+var mCmd = &cobra.Command{
+	Use:     "monthly",
+	Short:   "Collection of monthly query",
+	Long:    `Collection of monthly query`,
+	Aliases: []string{"m"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			cmd.Help()
@@ -20,5 +20,5 @@ var dCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(dCmd)
+	rootCmd.AddCommand(mCmd)
 }
