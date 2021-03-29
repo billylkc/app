@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/billylkc/app/calc"
-	util "github.com/billylkc/app/util"
+	"github.com/billylkc/app/util"
 	"github.com/spf13/cobra"
 )
 
