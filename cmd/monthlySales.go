@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
+	"github.com/billylkc/app/calc"
 	"github.com/billylkc/app/util"
 	"github.com/spf13/cobra"
 )
@@ -26,19 +26,19 @@ var mSalesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(d)
-		// res, err := calc.GetMonthlySales(d, 1)
-		// if err != nil {
-		// 	return err
-		// }
 
-		// headers := []string{"Date", "Count", "Total"}
-		// ignores := []string{}
-		// data := util.InterfaceSlice(res)
-		// err = util.PrintTable(data, headers, ignores, 3)
-		// if err != nil {
-		// 	return err
-		// }
+		res, err := calc.GetMonthlySales(d, nrecords)
+		if err != nil {
+			return err
+		}
+
+		headers := []string{"Date", "Count", "Total"}
+		ignores := []string{}
+		data := util.InterfaceSlice(res)
+		err = util.PrintTable(data, headers, ignores, 3)
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 }
