@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -93,10 +94,20 @@ func PrintTable(data []interface{}, headers, ignore []string, colMerge int) erro
 				v := humanize.CommafWithDigits(t, 1)
 				r = append(r, v)
 			case int64:
-				v := humanize.Comma(t)
+				v := ""
+				if strings.Contains(name, "ID") { // Handle ID column, no comma
+					v = fmt.Sprintf("%d", t)
+				} else {
+					v = humanize.Comma(t)
+				}
 				r = append(r, v)
 			case int:
-				v := humanize.Comma(int64(t))
+				v := ""
+				if strings.Contains(name, "ID") { // Handle ID column, no comma
+					v = fmt.Sprintf("%d", t)
+				} else {
+					v = humanize.Comma(int64(t))
+				}
 				r = append(r, v)
 			default:
 				r = append(r, field)

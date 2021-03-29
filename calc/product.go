@@ -15,8 +15,8 @@ type ProductRecord struct {
 	Category    string
 	ProductID   int
 	ProductName string
-	Quantity    int
 	Total       float64
+	Quantity    int
 }
 
 // GetDailyProduct returns the latest product sales record for the past n days
