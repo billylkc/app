@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
@@ -32,16 +31,13 @@ var mMembersCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// headers := []string{"Date", "Username", "DayTotal", "Average", "GrandTotal"}
-		// ignores := []string{"ID"}
-		// data := util.InterfaceSlice(res)
-		// err = util.PrintTable(data, headers, ignores, 1)
-		// if err != nil {
-		// 	return err
-		// }
-
-		fmt.Println(res)
-
+		headers := []string{"Date", "Username", "MonthlyTotal", "Average", "GrandTotal"}
+		ignores := []string{"ID"}
+		data := util.InterfaceSlice(res)
+		err = util.PrintTable(data, headers, ignores, 1)
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 }
