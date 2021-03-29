@@ -28,8 +28,8 @@ func GetDailyMember(d string, n int) ([]MemberRecord, error) {
 	if err != nil {
 		return records, err
 	}
-	start := t.AddDate(0, 0, -n).Format("2006-01-02") // start date
-	end := t.AddDate(0, 0, 1).Format("2006-01-02")    // end date
+	start := t.AddDate(0, 0, -n+1).Format("2006-01-02") // start date
+	end := t.AddDate(0, 0, 1).Format("2006-01-02")      // end date
 
 	db, err := database.GetConnection()
 	if err != nil {

@@ -17,8 +17,9 @@ var mSalesCmd = &cobra.Command{
 	Example: `  app monthly sales -d "2021-03-24"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if len(args) == 1 {
-			date = args[0]
+		err := util.HandleDateArgs(&date, &nrecords, 1, args...)
+		if err != nil {
+			return err
 		}
 
 		d, err := util.ParseDateInput(date, "m")
@@ -26,7 +27,7 @@ var mSalesCmd = &cobra.Command{
 			return err
 		}
 		fmt.Println(d)
-		// res, err := calc.GetMonthlySales(d, 7)
+		// res, err := calc.GetMonthlySales(d, 1)
 		// if err != nil {
 		// 	return err
 		// }

@@ -10,34 +10,87 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jinzhu/now"
 )
 
+// HandleDateArgs
+func HandleDateArgs(date *string, nrecords *int, defaultN int, args ...string) error {
+	var err error
+	if len(args) == 1 {
+		*date = args[0]
+		*nrecords = defaultN
+	} else if len(args) == 2 {
+		*date = args[0]
+		*nrecords, err = strconv.Atoi(args[1])
+		if err != nil {
+			return err
+		}
+	} else {
+		*nrecords = defaultN
+	}
+	return nil
+}
+
 // ParseDateInput parse the input for past n days, or actual day string in YYYY-MM-DD format
-// result depends on freq, daily, monthly -> 2021-03-01, weekly(TODO)
+// result depends on freq, daily, monthly -> 2021-03-01, weekly -> start from monday
 func ParseDateInput(s, freq string) (string, error) {
-	var res string
+	var (
+		t     time.Time
+		dateF string
+		err   error
+	)
+
+	// Set config
+	location, _ := time.LoadLocation("Asia/Shanghai")
+	tconfig := &now.Config{
+		WeekStartDay: time.Monday,
+		TimeLocation: location,
+		TimeFormats:  []string{"2006-01-02"},
+	}
 
 	// Check if input is in YYYY-MM-DD format
 	if len(s) == 10 {
-		// TODO: Check for pattern
-		return s, nil
+		t, err = now.Parse(s)
+		if err != nil {
+			return dateF, fmt.Errorf("Invalid input for date. Need a date in YYYY-MM-DD format or number for past n days/weeks/months.")
+		}
+	} else {
+		// Convert to date
+		n, err := strconv.Atoi(s)
+		if err != nil {
+			return dateF, fmt.Errorf("Invalid input for date. Need a date in YYYY-MM-DD format or number for past n days/weeks/months")
+		}
+		switch freq {
+		case "d": // Daily
+			t = time.Now().AddDate(0, 0, -n)
+
+		case "w": // Daily
+			t = time.Now().AddDate(0, 0, -n*7)
+
+		case "m": //Monthly
+			t = time.Now().AddDate(0, -n, 0)
+
+		default:
+			t = time.Now()
+		}
 	}
 
-	// Convert to date
-	d, err := strconv.Atoi(s)
-	if err != nil {
-		return res, fmt.Errorf("Invalid input for date. Need a date in YYYY-MM-DD format or number for past n days")
-	}
+	// Handle frequency
 	switch freq {
 	case "d": // Daily
-		res = time.Now().AddDate(0, 0, -d).Format("2006-01-02")
-	case "m": //Monthly
-		res = "2021-03-01"
+		dateF = t.Format("2006-01-02")
+
+	case "w": // Weekly
+		dateF = tconfig.With(t).BeginningOfWeek().Format("2006-01-02")
+
+	case "m": // Monthly
+		dateF = tconfig.With(t).BeginningOfMonth().Format("2006-01-02")
+
 	default:
-		res = time.Now().Format("2006-01-02")
+		dateF = time.Now().Format("2006-01-02")
 	}
 
-	return res, nil
+	return dateF, nil
 }
 
 // InterfaceSlice converts a list of struct to list of interface

@@ -6,6 +6,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jedib0t/go-pretty/v6 v6.1.0
+	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.3

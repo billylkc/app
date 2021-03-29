@@ -17,8 +17,9 @@ var dMembersCmd = &cobra.Command{
 	Example: `  app daily members -d "2021-03-25"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if len(args) == 1 {
-			date = args[0]
+		err := util.HandleDateArgs(&date, &nrecords, 1, args...)
+		if err != nil {
+			return err
 		}
 
 		d, err := util.ParseDateInput(date, "d")
@@ -26,7 +27,7 @@ var dMembersCmd = &cobra.Command{
 			return err
 		}
 
-		res, err := calc.GetDailyMember(d, 0)
+		res, err := calc.GetDailyMember(d, nrecords)
 		if err != nil {
 			return err
 		}

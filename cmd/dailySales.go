@@ -17,8 +17,9 @@ var dSalesCmd = &cobra.Command{
 	Example: `  app daily sales -d "2021-03-24"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		if len(args) == 1 {
-			date = args[0]
+		err := util.HandleDateArgs(&date, &nrecords, 7, args...)
+		if err != nil {
+			return err
 		}
 
 		d, err := util.ParseDateInput(date, "d")
@@ -26,7 +27,7 @@ var dSalesCmd = &cobra.Command{
 			return err
 		}
 
-		res, err := calc.GetDailySales(d, 7)
+		res, err := calc.GetDailySales(d, nrecords)
 		if err != nil {
 			return err
 		}
@@ -34,7 +35,7 @@ var dSalesCmd = &cobra.Command{
 		headers := []string{"Date", "Count", "Total"}
 		ignores := []string{}
 		data := util.InterfaceSlice(res)
-		err = util.PrintTable(data, headers, ignores, 3)
+		err = util.PrintTable(data, headers, ignores, 1)
 		if err != nil {
 			return err
 		}

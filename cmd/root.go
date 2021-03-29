@@ -12,8 +12,9 @@ import (
 
 // Some global inputs
 var (
-	cfgFile string
-	date    string
+	cfgFile  string
+	date     string // date in YYYY-MM-DD format, or past n days/weeks/months
+	nrecords int
 )
 
 // rootCmd represents the base command when called without any subcommands

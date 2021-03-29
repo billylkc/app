@@ -14,10 +14,15 @@ var dProductCmd = &cobra.Command{
 	Short:   "Daily products.",
 	Long:    `Daily products.`,
 	Aliases: []string{"p"},
-	Example: `  app daily products -d "2020-03-25"`,
+	Example: `
+  app daily products -d "2020-03-25"
+  app daily products 1 2 (Starting from one day ago, return two records)
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) == 1 {
-			date = args[0]
+
+		err := util.HandleDateArgs(&date, &nrecords, 1, args...)
+		if err != nil {
+			return err
 		}
 
 		d, err := util.ParseDateInput(date, "d")
@@ -25,7 +30,7 @@ var dProductCmd = &cobra.Command{
 			return err
 		}
 
-		res, err := calc.GetDailyProduct(d, 0)
+		res, err := calc.GetDailyProduct(d, nrecords)
 		if err != nil {
 			return err
 		}
