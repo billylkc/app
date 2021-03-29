@@ -20,7 +20,7 @@ func TestParseDateInput(t *testing.T) {
 			args: args{
 				s: "5",
 			},
-			want: time.Now().AddDate(0, 0, -4).Format("2006-01-02"),
+			want: time.Now().AddDate(0, 0, -5).Format("2006-01-02"),
 		},
 		{
 			name: "today",
@@ -28,6 +28,20 @@ func TestParseDateInput(t *testing.T) {
 				s: time.Now().Format("2006-01-02"),
 			},
 			want: time.Now().Format("2006-01-02"),
+		},
+		{
+			name: "yesterday",
+			args: args{
+				s: "1",
+			},
+			want: time.Now().AddDate(0, 0, -1).Format("2006-01-02"),
+		},
+		{
+			name: "the day before yesterday",
+			args: args{
+				s: "2",
+			},
+			want: time.Now().AddDate(0, 0, -2).Format("2006-01-02"),
 		},
 		{
 			name: "Normal day in YYYY-MM-DD",

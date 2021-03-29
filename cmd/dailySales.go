@@ -16,6 +16,11 @@ var dailySalesCmd = &cobra.Command{
 	Aliases: []string{"s"},
 	Example: `  app daily sales -d "2021-03-24"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		if len(args) == 1 {
+			date = args[0]
+		}
+
 		d, err := util.ParseDateInput(date)
 		if err != nil {
 			return err
@@ -27,8 +32,9 @@ var dailySalesCmd = &cobra.Command{
 		}
 
 		headers := []string{"Date", "Count", "Total"}
+		ignores := []string{}
 		data := util.InterfaceSlice(res)
-		err = util.PrintTable(data, headers, 3)
+		err = util.PrintTable(data, headers, ignores, 3)
 		if err != nil {
 			return err
 		}
