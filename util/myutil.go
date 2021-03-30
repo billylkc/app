@@ -13,7 +13,8 @@ import (
 	"github.com/jinzhu/now"
 )
 
-// HandleDateArgs
+// HandleDateArgs handles non flag input arguments
+// mostly handle nrecords only, where n could be days, weeks, or months
 func HandleDateArgs(date *string, nrecords *int, defaultN int, args ...string) error {
 	var err error
 	if len(args) == 1 {
