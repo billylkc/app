@@ -20,9 +20,12 @@ type MemberRecord struct {
 	GrandTotal float64
 }
 
+var memberLimit int
+
 // GetDailyMember returns daily member spendings
 func GetDailyMember(d string, n int) ([]MemberRecord, error) {
 	var records []MemberRecord
+	memberLimit = 50
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -80,12 +83,14 @@ INNER JOIN
 		GROUP BY DATE, CUSTOMER_ID
 	) as o
 	GROUP BY CUSTOMER_ID
-) as total
-on op.CUSTOMER_ID = total.CUSTOMER_ID
+) as tt
+on op.CUSTOMER_ID = tt.CUSTOMER_ID
+WHERE total >= %d
 GROUP BY DATE, op.CUSTOMER_ID, USERNAME
 ORDER BY DATE DESC, TOTAL DESC
     `
-	query := fmt.Sprintf(queryF, start, end)
+	query := fmt.Sprintf(queryF, start, end, memberLimit)
+
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {
@@ -107,6 +112,7 @@ ORDER BY DATE DESC, TOTAL DESC
 // GetWeeklyMember returns weekly member spendings
 func GetWeeklyMember(d string, n int) ([]MemberRecord, error) {
 	var records []MemberRecord
+	memberLimit = 200
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -170,17 +176,17 @@ INNER JOIN
                         GROUP BY DATE, CUSTOMER_ID
     ) as o
     GROUP BY CUSTOMER_ID
-        ) as total
-on oop.CUSTOMER_ID = total.CUSTOMER_ID
+        ) as tt
+on oop.CUSTOMER_ID = tt.CUSTOMER_ID
+WHERE total >= %d
 ORDER BY DATE DESC, TOTAL DESC
-
-
 `
 	query := fmt.Sprintf(queryF,
 		"CAST(SUBDATE(op.created_date, WEEKDAY(op.created_date)) AS DATE) AS DATE",
 		start,
 		end,
 		"CAST(SUBDATE(created_date, WEEKDAY(created_date)) AS DATE) AS DATE",
+		memberLimit,
 	)
 
 	results, err := db.Query(query)
@@ -204,6 +210,7 @@ ORDER BY DATE DESC, TOTAL DESC
 // GetMonthlyMember returns daily member spendings
 func GetMonthlyMember(d string, n int) ([]MemberRecord, error) {
 	var records []MemberRecord
+	memberLimit = 1000
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -268,8 +275,9 @@ INNER JOIN
 			GROUP BY ADATE, CUSTOMER_ID
     ) as o
     GROUP BY CUSTOMER_ID
-	) as total
-on oop.CUSTOMER_ID = total.CUSTOMER_ID
+	) as tt
+on oop.CUSTOMER_ID = tt.CUSTOMER_ID
+WHERE total >= %d
 ORDER BY DATE DESC, TOTAL DESC
 `
 	query := fmt.Sprintf(queryF,
@@ -277,6 +285,7 @@ ORDER BY DATE DESC, TOTAL DESC
 		start,
 		end,
 		"CAST(DATE_FORMAT(order_product.created_date,'%Y-%m-01') as DATE) as ADATE",
+		memberLimit,
 	)
 	results, err := db.Query(query)
 	defer results.Close()

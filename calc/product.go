@@ -19,9 +19,12 @@ type ProductRecord struct {
 	Quantity    int
 }
 
+var totalLimit int // Limit for printing popular Product
+
 // GetDailyProduct returns the latest product sales record for the past n days
 func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
 	var records []ProductRecord
+	totalLimit = 100
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -46,7 +49,7 @@ func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
         SUM(op.total) total
     FROM (
         SELECT
-            created_date as OrderDate,
+            CAST(created_date AS DATE) as OrderDate,
             product_id,
             quantity,
             total
@@ -80,11 +83,12 @@ func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
     WHERE c.language_id = 1) as pc
 
     ON pc.product_id = op.product_id
-    WHERE op.OrderDate >= '%s' and op.OrderDate <= '%s'
+    WHERE op.OrderDate >= '%s' and op.OrderDate <= '%s' and total >= %d
     GROUP BY op.OrderDate, pc.category_name, op.product_id, p.product_name
-    ORDER BY OrderDate desc, pc.category_name, op.product_id
+    ORDER BY OrderDate desc, total desc, pc.category_name, op.product_id
     `
-	query := fmt.Sprintf(queryF, start, end)
+	query := fmt.Sprintf(queryF, start, end, totalLimit)
+
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {
@@ -105,6 +109,7 @@ func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
 // GetMonthlyProduct returns the latest product sales record for the past n months
 func GetMonthlyProduct(d string, n int) ([]ProductRecord, error) {
 	var records []ProductRecord
+	totalLimit = 500
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -113,9 +118,6 @@ func GetMonthlyProduct(d string, n int) ([]ProductRecord, error) {
 	}
 	start := t.AddDate(0, -n, 0).Format("2006-01-02") // start date
 	end := t.Format("2006-01-02")                     // end date
-
-	fmt.Println(start)
-	fmt.Println(end)
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -174,15 +176,16 @@ FROM product_to_category as pc
 WHERE c.language_id = 1) as pc
 
 ON pc.product_id = oop.product_id
-WHERE oop.Date >= '%s' and oop.Date <= '%s'
+WHERE oop.Date >= '%s' and oop.Date <= '%s' and total >= %d
 GROUP BY oop.Date, pc.category_name, oop.product_id, p.product_name
-ORDER BY oop.Date desc, pc.category_name, oop.product_id
+ORDER BY oop.Date desc, total DESC, pc.category_name, oop.product_id
 
     `
 	query := fmt.Sprintf(queryF,
 		"CAST(DATE_FORMAT(created_date,'%Y-%m-01') as DATE) AS OrderDate",
 		start,
-		end)
+		end,
+		totalLimit)
 
 	results, err := db.Query(query)
 	defer results.Close()
