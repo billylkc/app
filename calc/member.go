@@ -104,6 +104,103 @@ ORDER BY DATE DESC, TOTAL DESC
 	return records, nil
 }
 
+// GetWeeklyMember returns weekly member spendings
+func GetWeeklyMember(d string, n int) ([]MemberRecord, error) {
+	var records []MemberRecord
+
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", d)
+	if err != nil {
+		return records, err
+	}
+	end := now.With(t).Format("2006-01-02")
+	start := t.AddDate(0, 0, -n*7).Format("2006-01-02")
+
+	db, err := database.GetConnection()
+	if err != nil {
+		return records, err
+	}
+
+	queryF := `
+SELECT
+    DATE,
+    oop.CUSTOMER_ID,
+    USERNAME,
+    TOTAL,
+    AVERAGE,
+    GrandTotal
+FROM
+        (SELECT
+                DATE,
+                CUSTOMER_ID,
+                USERNAME,
+                SUM(TOTAL) as TOTAL
+        FROM
+                (SELECT
+						%s,
+                        op.CUSTOMER_ID,
+                        c.USERNAME,
+                        Total
+                FROM order_product as op
+                        INNER JOIN customer as c
+                          ON op.customer_id = c.id
+                WHERE op.created_date >= '%s' and op.created_date <= '%s') as op
+        GROUP BY
+                DATE,
+                CUSTOMER_ID,
+                USERNAME) as oop
+
+INNER JOIN
+        (SELECT
+        CUSTOMER_ID,
+        AVG(MonthTotal) as AVERAGE,
+        SUM(MonthTotal) as GrandTotal
+    FROM (
+
+                SELECT
+                        DATE,
+                        CUSTOMER_ID,
+                        SUM(Total) as MonthTotal
+                        FROM
+                                (SELECT
+                                        %s,
+                                        CUSTOMER_ID,
+                                        Total
+                                FROM order_product) as day
+                        GROUP BY DATE, CUSTOMER_ID
+    ) as o
+    GROUP BY CUSTOMER_ID
+        ) as total
+on oop.CUSTOMER_ID = total.CUSTOMER_ID
+ORDER BY DATE DESC, TOTAL DESC
+
+
+`
+	query := fmt.Sprintf(queryF,
+		"CAST(SUBDATE(op.created_date, WEEKDAY(op.created_date)) AS DATE) AS DATE",
+		start,
+		end,
+		"CAST(SUBDATE(created_date, WEEKDAY(created_date)) AS DATE) AS DATE",
+	)
+
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return records, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var rec MemberRecord
+		err = results.Scan(&rec.Date, &rec.ID, &rec.Username, &rec.Total, &rec.Average, &rec.GrandTotal)
+
+		if err != nil {
+			panic(err.Error())
+		}
+		records = append(records, rec)
+	}
+	return records, nil
+}
+
 // GetMonthlyMember returns daily member spendings
 func GetMonthlyMember(d string, n int) ([]MemberRecord, error) {
 	var records []MemberRecord

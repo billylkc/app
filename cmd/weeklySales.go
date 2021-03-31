@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
@@ -32,7 +31,6 @@ var wSalesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(res)
 
 		headers := []string{"Date", "Count", "Total"}
 		ignores := []string{}
