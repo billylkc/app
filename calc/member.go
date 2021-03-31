@@ -95,6 +95,7 @@ ORDER BY DATE DESC, TOTAL DESC
 	for results.Next() {
 		var rec MemberRecord
 		err = results.Scan(&rec.Date, &rec.ID, &rec.Username, &rec.Total, &rec.Average, &rec.GrandTotal)
+
 		if err != nil {
 			panic(err.Error())
 		}
@@ -189,6 +190,7 @@ ORDER BY DATE DESC, TOTAL DESC
 	for results.Next() {
 		var rec MemberRecord
 		err = results.Scan(&rec.Date, &rec.ID, &rec.Username, &rec.Total, &rec.Average, &rec.GrandTotal)
+
 		if err != nil {
 			panic(err.Error())
 		}
