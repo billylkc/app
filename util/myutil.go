@@ -97,16 +97,20 @@ func ParseDateInput(s, freq string) (string, error) {
 // InterfaceSlice converts a list of struct to list of interface
 func InterfaceSlice(slice interface{}) []interface{} {
 	s := reflect.ValueOf(slice)
+
 	if s.Kind() != reflect.Slice {
-		panic("InterfaceSlice() given a non-slice type")
+		// panic("InterfaceSlice() given a non-slice type")
+		ret := make([]interface{}, 1)
+		ret = append(ret, slice)
+		return ret
 	}
 
+	ret := make([]interface{}, s.Len())
 	// Keep the distinction between nil and empty slice input
 	if s.IsNil() {
 		return nil
 	}
 
-	ret := make([]interface{}, s.Len())
 	for i := 0; i < s.Len(); i++ {
 		ret[i] = s.Index(i).Interface()
 	}

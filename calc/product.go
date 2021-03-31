@@ -20,6 +20,18 @@ type ProductRecord struct {
 	Quantity    int
 }
 
+// Product as the product details of a particular item
+type Product struct {
+	ID          int     // product_id
+	Code        string  // code
+	Name        string  // Name
+	URL         string  // url
+	Price       float64 // price
+	ListedPrice float64 // tb_list_price
+	Discount    float64 // price
+	Active      bool
+}
+
 var totalLimit int // Limit for printing popular Product
 
 // GetDailyProduct returns the latest product sales record for the past n days
@@ -301,5 +313,91 @@ ORDER BY oop.Date desc, total DESC, pc.category_name, oop.product_id
 		}
 		records = append(records, rec)
 	}
+	return records, nil
+}
+
+// GetProductDetails gets product details with the provided product id
+func GetProductDetails(id int) ([]Product, error) {
+	var products []Product
+
+	db, err := database.GetConnection()
+	if err != nil {
+		return products, err
+	}
+
+	queryF := `
+    SELECT
+        product_id, code, url, name, price, tb_list_price, discount, is_active
+    FROM
+        product
+    where product_id = %d
+`
+	query := fmt.Sprintf(queryF, id)
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return products, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var rec Product
+		err = results.Scan(&rec.ID, &rec.Code, &rec.URL, &rec.Name, &rec.Price, &rec.ListedPrice, &rec.Discount, &rec.Active)
+		if err != nil {
+			return products, err
+		}
+		products = append(products, rec) // One record only anyway
+	}
+	return products, nil
+}
+
+// GetProductSalesRecords gets the historical record (weekly) of a particular product
+func GetProductSalesRecords(id int) ([]ProductRecord, error) {
+	var records []ProductRecord
+
+	db, err := database.GetConnection()
+	if err != nil {
+		return records, err
+	}
+
+	queryF := `
+SELECT
+	Date,
+	product_id,
+	SUM(quantity) as quantity,
+	SUM(total) as total
+FROM
+	(
+		SELECT
+			CAST(SUBDATE(created_date, WEEKDAY(created_date)) AS DATE) AS DATE,
+			product_id,
+			quantity,
+			total
+		FROM
+			order_product
+		WHERE
+			product_id = %d
+	) as op
+GROUP BY
+	DATE,
+	product_id
+ORDER BY
+	DATE DESC
+`
+	query := fmt.Sprintf(queryF, id)
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return records, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var rec ProductRecord
+		err = results.Scan(&rec.Date, &rec.ProductID, &rec.Quantity, &rec.Total)
+		if err != nil {
+			return records, err
+		}
+		records = append(records, rec) // One record only anyway
+	}
+
 	return records, nil
 }
