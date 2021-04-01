@@ -2,12 +2,14 @@ package calc
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/billylkc/app/database"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/now"
 	"github.com/pkg/errors"
+	"github.com/sahilm/fuzzy"
 )
 
 // MemberRecord as sales record for different members
@@ -20,7 +22,33 @@ type MemberRecord struct {
 	GrandTotal float64
 }
 
-var memberLimit int
+type PurchaseHistory struct {
+	Date        time.Time
+	Username    string
+	ProductID   int
+	ProductName string
+	Count       int
+	Total       float64
+}
+
+type MonthlySales struct {
+	Field      string
+	GrandTotal float64
+	Month      string
+	Total      float64
+}
+
+type members []MemberRecord
+
+var memberLimit int // Filtering criteria for listing members
+
+func (m members) String(i int) string {
+	return m[i].Username
+}
+
+func (m members) Len() int {
+	return len(m)
+}
 
 // GetDailyMember returns daily member spendings
 func GetDailyMember(d string, n int) ([]MemberRecord, error) {
@@ -41,7 +69,6 @@ func GetDailyMember(d string, n int) ([]MemberRecord, error) {
 	}
 
 	queryF := `
-
 SELECT
     DATE,
     op.CUSTOMER_ID,
@@ -303,4 +330,227 @@ ORDER BY DATE DESC, TOTAL DESC
 		records = append(records, rec)
 	}
 	return records, nil
+}
+
+// GetPurchaseHistory gets the monthly purchase history of the member queried
+// member name is matched with fuzzy search (loosely)
+func GetPurchaseHistory(s string) ([]PurchaseHistory, []PurchaseHistory, error) {
+	var (
+		md   []PurchaseHistory // Member details - member monthly total, etc
+		ph   []PurchaseHistory // Purchase history - items per month
+		full members           // Use by fuzzy search
+		ids  []string          // list of members id result from fuzzy search
+	)
+
+	db, err := database.GetConnection()
+	if err != nil {
+		return md, ph, err
+	}
+
+	// Get list of user id first using fuzzy search
+	queryF := `
+    SELECT
+        ID,
+        USERNAME
+    FROM customer
+    `
+	query := fmt.Sprintf(queryF)
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return md, ph, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var rec MemberRecord
+		err = results.Scan(&rec.ID, &rec.Username)
+
+		if err != nil {
+			panic(err.Error())
+		}
+		full = append(full, rec)
+	}
+	res := fuzzy.FindFrom(s, full)
+	for _, r := range res {
+		ids = append(ids, fmt.Sprintf("\"%s\"", full[r.Index].ID))
+	}
+	idList := strings.Join(ids, ", ")
+
+	// Member total
+	queryF = `
+    SELECT
+        date,
+        c.username,
+        count(1) as count,
+        sum(total) as total
+     FROM (
+        SELECT
+            %s,
+            customer_id,
+            total
+        FROM
+            order_product
+        WHERE
+            customer_id in (%s)
+     ) as op
+         INNER JOIN
+             customer as c
+                 on c.id = op.customer_id
+     GROUP BY date, customer_id
+     order by customer_id, date desc, total desc
+`
+	query = fmt.Sprintf(queryF,
+		"CAST(DATE_FORMAT(created_date,'%Y-%m-01') as DATE) as date",
+		idList,
+	)
+
+	results, err = db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return md, ph, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var rec PurchaseHistory
+		err = results.Scan(&rec.Date, &rec.Username, &rec.Count, &rec.Total)
+		if err != nil {
+			panic(err.Error())
+		}
+		md = append(md, rec)
+	}
+
+	// Detailed purchase history
+	queryF = `
+    SELECT
+        date,
+        c.username,
+        op.product_id,
+        p.name as product_name,
+        count(1) as count,
+        sum(total) as total
+     FROM (
+        SELECT
+            %s,
+            customer_id,
+            product_id,
+            total
+        FROM
+            order_product
+        WHERE
+            customer_id in (%s)
+     ) as op
+         INNER JOIN
+             product as p
+                 on p.product_id = op.product_id
+         INNER JOIN
+             customer as c
+                 on c.id = op.customer_id
+     GROUP BY date, customer_id, product_id
+     order by customer_id, date desc, total desc
+    `
+	query = fmt.Sprintf(queryF,
+		"CAST(DATE_FORMAT(created_date,'%Y-%m-01') as DATE) as date",
+		idList,
+	)
+
+	results, err = db.Query(query)
+	defer results.Close()
+
+	if err != nil {
+		return md, ph, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var rec PurchaseHistory
+		err = results.Scan(&rec.Date, &rec.Username, &rec.ProductID, &rec.ProductName, &rec.Count, &rec.Total)
+
+		if err != nil {
+			panic(err.Error())
+		}
+		ph = append(ph, rec)
+	}
+
+	return md, ph, nil
+}
+
+func GetTopMembers(nrecords int) (map[int][]MonthlySales, error) {
+	m := make(map[int][]MonthlySales)
+
+	db, err := database.GetConnection()
+	if err != nil {
+		return m, err
+	}
+
+	queryF := `
+SELECT
+	RANK,
+	c.username,
+	GrandTotal,
+	YearMonth,
+	MonthTotal
+FROM
+(
+	SELECT
+		%s,
+		CUSTOMER_ID,
+		SUM(Total) as MonthTotal
+	FROM
+			(SELECT
+					%s,
+					CUSTOMER_ID,
+					Total
+			FROM order_product) as day
+	GROUP BY DATE, CUSTOMER_ID
+) as op
+
+INNER JOIN
+
+(SELECT @rn:=@rn+1 AS rank, customer_id, GrandTotal
+FROM (
+  SELECT
+		customer_id,
+		sum(total) as GrandTotal
+	FROM
+		order_product
+	WHERE
+		customer_id is not null
+	GROUP BY
+		customer_id
+	ORDER BY
+		GrandTotal desc
+) t1, (SELECT @rn:=0) t2) as tt
+
+	on op.customer_id = tt.customer_id
+
+INNER JOIN
+	customer as c
+		on c.id = op.customer_id
+
+WHERE tt.rank <= %d
+order by rank, YearMonth desc, MonthTotal desc
+    `
+	query := fmt.Sprintf(queryF,
+		"DATE_FORMAT(DATE,'%Y-%m') as YearMonth",
+		"CAST(DATE_FORMAT(order_product.created_date,'%Y-%m-01') as DATE) as DATE",
+		nrecords,
+	)
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return m, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var (
+			rank int
+			rec  MonthlySales
+		)
+		err = results.Scan(&rank, &rec.Field, &rec.GrandTotal, &rec.Month, &rec.Total)
+		if v, ok := m[rank]; ok {
+			m[rank] = append(v, rec)
+		} else {
+			m[rank] = []MonthlySales{rec}
+		}
+	}
+	return m, nil
 }

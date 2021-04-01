@@ -2,9 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
 
-	"github.com/billylkc/app/app"
 	"github.com/spf13/cobra"
 )
 
@@ -13,9 +11,20 @@ var devCmd = &cobra.Command{
 	Use:   "dev",
 	Short: "For development purpose.",
 	Long:  `For development purpose.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		res := app.Dev()
-		fmt.Println(res)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// var s string
+		// if len(args) > 0 {
+		// 	s = strings.Join(args, " ")
+		// } else {
+		// 	return fmt.Errorf("not enough argumetns\n")
+		// }
+		// res, err := calc.FindMembers(s)
+		// if err != nil {
+		// 	return err
+		// }
+
+		// fmt.Println(PrettyPrint(res))
+		return nil
 	},
 }
 

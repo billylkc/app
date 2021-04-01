@@ -16,7 +16,7 @@ var productCmd = &cobra.Command{
 	Short:   "Query the performance of individual product.",
 	Long:    `Query the performance of individual product.`,
 	Aliases: []string{"p"},
-	Example: `  app query product 180125"`,
+	Example: `  app query product 177976`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var (
 			id  int
