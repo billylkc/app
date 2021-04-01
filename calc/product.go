@@ -401,3 +401,82 @@ ORDER BY
 
 	return records, nil
 }
+
+func GetTopProducts(nrecords int) (map[int][]MonthlySales, error) {
+	m := make(map[int][]MonthlySales)
+	fmt.Println("here")
+	db, err := database.GetConnection()
+	if err != nil {
+		return m, err
+	}
+
+	queryF := `
+SELECT
+	RANK,
+    op.PRODUCT_ID,
+	GrandTotal,
+	YearMonth,
+	MonthTotal
+FROM
+(
+	SELECT
+		%s,
+		PRODUCT_ID,
+		SUM(Total) as MonthTotal
+	FROM
+			(SELECT
+					%s,
+					product_id,
+					Total
+			FROM order_product) as day
+	GROUP BY DATE, product_id
+) as op
+
+INNER JOIN
+
+(SELECT @rn:=@rn+1 AS rank, product_id, GrandTotal
+FROM (
+  SELECT
+		PRODUCT_ID,
+		sum(total) as GrandTotal
+	FROM
+		order_product
+	WHERE
+		PRODUCT_ID is not null
+	GROUP BY
+		PRODUCT_ID
+	ORDER BY
+		GrandTotal desc
+) t1, (SELECT @rn:=0) t2) as tt
+
+	on op.PRODUCT_ID = tt.PRODUCT_ID
+
+WHERE tt.rank <= %d
+order by rank, YearMonth desc, MonthTotal desc
+    `
+	query := fmt.Sprintf(queryF,
+		"DATE_FORMAT(DATE,'%Y-%m') as YearMonth",
+		"CAST(DATE_FORMAT(order_product.created_date,'%Y-%m-01') as DATE) as DATE",
+		nrecords,
+	)
+
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return m, errors.Wrap(err, "cant execute query")
+	}
+
+	for results.Next() {
+		var (
+			rank int
+			rec  MonthlySales
+		)
+		err = results.Scan(&rank, &rec.Field, &rec.GrandTotal, &rec.Month, &rec.Total)
+		if v, ok := m[rank]; ok {
+			m[rank] = append(v, rec)
+		} else {
+			m[rank] = []MonthlySales{rec}
+		}
+	}
+	return m, nil
+}
