@@ -68,7 +68,8 @@ var tProductsCmd = &cobra.Command{
 		sort.Strings(headerSorted)
 
 		// Prepare header
-		headerR = append(headerR, "Product")
+		headerR = append(headerR, "Product ID")
+		headerR = append(headerR, "Name")
 		headerR = append(headerR, "GrandTotal")
 		for _, k := range headerSorted {
 			headerR = append(headerR, k)
@@ -79,9 +80,11 @@ var tProductsCmd = &cobra.Command{
 			m := make(map[string]float64)
 			rows := topProducts[i]
 
-			username := rows[0].Field
+			productID := rows[0].Field
+			productName := rows[0].Name
 			grandTotal := rows[0].GrandTotal
-			tr = append(tr, username)
+			tr = append(tr, productID)
+			tr = append(tr, productName)
 			tr = append(tr, humanize.CommafWithDigits(grandTotal, 1))
 			for _, r := range rows {
 				m[r.Month] = r.Total

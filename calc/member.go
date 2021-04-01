@@ -32,7 +32,8 @@ type PurchaseHistory struct {
 }
 
 type MonthlySales struct {
-	Field      string
+	Field      string // username, product_id
+	Name       string //  productName
 	GrandTotal float64
 	Month      string
 	Total      float64

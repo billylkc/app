@@ -404,7 +404,6 @@ ORDER BY
 
 func GetTopProducts(nrecords int) (map[int][]MonthlySales, error) {
 	m := make(map[int][]MonthlySales)
-	fmt.Println("here")
 	db, err := database.GetConnection()
 	if err != nil {
 		return m, err
@@ -414,6 +413,7 @@ func GetTopProducts(nrecords int) (map[int][]MonthlySales, error) {
 SELECT
 	RANK,
     op.PRODUCT_ID,
+    p.name as PRODUCT_NAME,
 	GrandTotal,
 	YearMonth,
 	MonthTotal
@@ -451,6 +451,10 @@ FROM (
 
 	on op.PRODUCT_ID = tt.PRODUCT_ID
 
+INNER JOIN
+    product as p
+       ON p.product_id = op.product_id
+
 WHERE tt.rank <= %d
 order by rank, YearMonth desc, MonthTotal desc
     `
@@ -471,7 +475,7 @@ order by rank, YearMonth desc, MonthTotal desc
 			rank int
 			rec  MonthlySales
 		)
-		err = results.Scan(&rank, &rec.Field, &rec.GrandTotal, &rec.Month, &rec.Total)
+		err = results.Scan(&rank, &rec.Field, &rec.Name, &rec.GrandTotal, &rec.Month, &rec.Total)
 		if v, ok := m[rank]; ok {
 			m[rank] = append(v, rec)
 		} else {
