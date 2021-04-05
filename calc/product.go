@@ -38,7 +38,7 @@ var totalLimit int // Limit for printing popular Product
 func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
 	var records []ProductRecord
 	totalLimit = 100
-
+	fmt.Printf("\nShowing daily top products with sales larger than - %d \n\n", totalLimit)
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
 	if err != nil {
@@ -105,6 +105,7 @@ FROM
     ORDER BY OrderDate desc, total desc, pc.category_name, op.product_id
 ) as final
 WHERE lumpsum >= %d
+ORDER BY Date desc, lumpsum desc
     `
 	query := fmt.Sprintf(queryF, start, end, totalLimit)
 	results, err := db.Query(query)
@@ -128,6 +129,7 @@ WHERE lumpsum >= %d
 func GetWeeklyProduct(d string, n int) ([]ProductRecord, error) {
 	var records []ProductRecord
 	totalLimit = 500
+	fmt.Printf("\nShowing weekly top products with sales larger than - %d \n\n", totalLimit)
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -231,6 +233,7 @@ WHERE lumpsum >= %d
 func GetMonthlyProduct(d string, n int) ([]ProductRecord, error) {
 	var records []ProductRecord
 	totalLimit = 1000
+	fmt.Printf("\nShowing monthly top products with sales larger than - %d \n\n", totalLimit)
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
