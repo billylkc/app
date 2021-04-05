@@ -22,6 +22,11 @@ var wSalesCmd = &cobra.Command{
 			return err
 		}
 
+		// As weekly will take the incomplete week, need to subtract one week to balance it out
+		if nrecords >= 1 {
+			nrecords -= 1
+		}
+
 		d, err := util.ParseDateInput(date, "w")
 		if err != nil {
 			return err

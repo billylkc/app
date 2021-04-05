@@ -65,8 +65,8 @@ func ParseDateInput(s, freq string) (string, error) {
 		case "d": // Daily
 			t = time.Now().AddDate(0, 0, -n)
 
-		case "w": // Daily
-			t = time.Now().AddDate(0, 0, -n*7)
+		case "w": // Weekly
+			t = time.Now().AddDate(0, 0, -n*7+6)
 
 		case "m": //Monthly
 			t = time.Now().AddDate(0, -n, 0)
@@ -81,8 +81,9 @@ func ParseDateInput(s, freq string) (string, error) {
 	case "d": // Daily
 		dateF = t.Format("2006-01-02")
 
-	case "w": // Weekly
-		dateF = tconfig.With(t).BeginningOfWeek().Format("2006-01-02")
+	case "w": // Weekly.
+		t := tconfig.With(t).BeginningOfWeek()
+		dateF = tconfig.With(t).Format("2006-01-02")
 
 	case "m": // Monthly
 		dateF = tconfig.With(t).BeginningOfMonth().Format("2006-01-02")
@@ -190,6 +191,7 @@ func PrintTable(data []interface{}, headers, ignore []string, colMerge int) erro
 			c := table.ColumnConfig{
 				Number:    i,
 				AutoMerge: true,
+				WidthMax:  80,
 			}
 			cc = append(cc, c)
 		}

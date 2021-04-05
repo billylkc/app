@@ -53,13 +53,17 @@ func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
 	}
 
 	queryF := `
+SELECT
+*
+FROM
+(
     SELECT
         op.OrderDate as Date,
         COALESCE(pc.category_name, ""),
         op.product_id,
         p.product_name,
         SUM(op.quantity) quantiy,
-        SUM(op.total) total
+        SUM(op.total) lumpsum
     FROM (
         SELECT
             CAST(created_date AS DATE) as OrderDate,
@@ -96,12 +100,13 @@ func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
     WHERE c.language_id = 1) as pc
 
     ON pc.product_id = op.product_id
-    WHERE op.OrderDate >= '%s' and op.OrderDate <= '%s' and total >= %d
+    WHERE op.OrderDate >= '%s' and op.OrderDate <= '%s'
     GROUP BY op.OrderDate, pc.category_name, op.product_id, p.product_name
     ORDER BY OrderDate desc, total desc, pc.category_name, op.product_id
+) as final
+WHERE lumpsum >= %d
     `
 	query := fmt.Sprintf(queryF, start, end, totalLimit)
-
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {

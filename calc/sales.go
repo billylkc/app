@@ -49,8 +49,8 @@ func GetDailySales(d string, n int) ([]SalesRecord, error) {
         created_date DESC
     LIMIT %d
     `
-	// query := fmt.Sprintf(queryF, "`order`", `"2021-03-25"`, n)
 	query := fmt.Sprintf(queryF, "`order`", d, n)
+
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {

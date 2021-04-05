@@ -16,6 +16,14 @@ func TestParseDateInput(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
+		// {
+		// 	name: "Next week",
+		// 	args: args{
+		// 		s:    "2021-04-03",
+		// 		freq: "w",
+		// 	},
+		// 	want: "2021-04-05",
+		// },
 		{
 			name: "Back 5 days",
 			args: args{
