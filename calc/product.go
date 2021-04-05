@@ -127,7 +127,7 @@ WHERE lumpsum >= %d
 // GetWeeklyProduct returns the latest product sales record for the past n weeks
 func GetWeeklyProduct(d string, n int) ([]ProductRecord, error) {
 	var records []ProductRecord
-	totalLimit = 1000
+	totalLimit = 500
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -144,61 +144,65 @@ func GetWeeklyProduct(d string, n int) ([]ProductRecord, error) {
 
 	queryF := `
 SELECT
-        oop.Date,
-        COALESCE(pc.category_name, ""),
-        oop.product_id,
-        p.product_name,
-        SUM(oop.quantity) quantiy,
-        SUM(oop.total) total
-FROM
-		(
-	SELECT
-		OrderDate as Date,
-		product_id,
-		SUM(quantity) as quantity,
-		SUM(total) as total
-	FROM
-	(
-		SELECT
-			%s,
-			product_id,
-			quantity,
-			total
-		FROM
-			order_product
-	) as op
-	GROUP BY
-		OrderDate, product_id
-	) as oop
+  *
+FROM (
+    SELECT
+            oop.Date,
+            COALESCE(pc.category_name, ""),
+            oop.product_id,
+            p.product_name,
+            SUM(oop.quantity) quantiy,
+            SUM(oop.total) lumpsum
+    FROM
+            (
+        SELECT
+            OrderDate as Date,
+            product_id,
+            SUM(quantity) as quantity,
+            SUM(total) as total
+        FROM
+        (
+            SELECT
+                %s,
+                product_id,
+                quantity,
+                total
+            FROM
+                order_product
+        ) as op
+        GROUP BY
+            OrderDate, product_id
+        ) as oop
 
-LEFT OUTER JOIN
+    LEFT OUTER JOIN
 
-(
-	SELECT
-		   product_id,
-		   name as product_name
-	FROM
-		   product
-) as p
+    (
+        SELECT
+               product_id,
+               name as product_name
+        FROM
+               product
+    ) as p
 
-ON oop.product_id = p.product_id
+    ON oop.product_id = p.product_id
 
-LEFT OUTER JOIN
+    LEFT OUTER JOIN
 
-(SELECT
-	pc.product_id,
-	pc.category_id,
-	c.name as category_name
-FROM product_to_category as pc
-	INNER JOIN category as c
-	  on pc.category_id = c.category_id
-WHERE c.language_id = 1) as pc
+    (SELECT
+        pc.product_id,
+        pc.category_id,
+        c.name as category_name
+    FROM product_to_category as pc
+        INNER JOIN category as c
+          on pc.category_id = c.category_id
+    WHERE c.language_id = 1) as pc
 
-ON pc.product_id = oop.product_id
-WHERE oop.Date >= '%s' and oop.Date <= '%s' and total >= %d
-GROUP BY oop.Date, pc.category_name, oop.product_id, p.product_name
-ORDER BY oop.Date desc, total DESC, pc.category_name, oop.product_id
-
+    ON pc.product_id = oop.product_id
+    WHERE oop.Date >= '%s' and oop.Date <= '%s'
+    GROUP BY oop.Date, pc.category_name, oop.product_id, p.product_name
+    ORDER BY oop.Date desc, total DESC, pc.category_name, oop.product_id
+) as final
+WHERE lumpsum >= %d
     `
 	query := fmt.Sprintf(queryF,
 		"CAST(SUBDATE(created_date, WEEKDAY(created_date)) AS DATE) AS OrderDate",
@@ -226,7 +230,7 @@ ORDER BY oop.Date desc, total DESC, pc.category_name, oop.product_id
 // GetMonthlyProduct returns the latest product sales record for the past n months
 func GetMonthlyProduct(d string, n int) ([]ProductRecord, error) {
 	var records []ProductRecord
-	totalLimit = 500
+	totalLimit = 1000
 
 	// handle stupid date, add one day before query
 	t, err := time.Parse("2006-01-02", d)
@@ -242,61 +246,64 @@ func GetMonthlyProduct(d string, n int) ([]ProductRecord, error) {
 	}
 
 	queryF := `
-SELECT
-        oop.Date,
-        COALESCE(pc.category_name, ""),
-        oop.product_id,
-        p.product_name,
-        SUM(oop.quantity) quantiy,
-        SUM(oop.total) total
-FROM
-		(
-	SELECT
-		OrderDate as Date,
-		product_id,
-		SUM(quantity) as quantity,
-		SUM(total) as total
-	FROM
-	(
-		SELECT
-			%s,
-			product_id,
-			quantity,
-			total
-		FROM
-			order_product
-	) as op
-	GROUP BY
-		OrderDate, product_id
-	) as oop
-LEFT OUTER JOIN
+SELECT *
+FROM (
+    SELECT
+            oop.Date,
+            COALESCE(pc.category_name, ""),
+            oop.product_id,
+            p.product_name,
+            SUM(oop.quantity) quantiy,
+            SUM(oop.total) lumpsum
+    FROM
+            (
+        SELECT
+            OrderDate as Date,
+            product_id,
+            SUM(quantity) as quantity,
+            SUM(total) as total
+        FROM
+        (
+            SELECT
+                %s,
+                product_id,
+                quantity,
+                total
+            FROM
+                order_product
+        ) as op
+        GROUP BY
+            OrderDate, product_id
+        ) as oop
+    LEFT OUTER JOIN
 
-(
-	SELECT
-		   product_id,
-		   name as product_name
-	FROM
-		   product
-) as p
+    (
+        SELECT
+               product_id,
+               name as product_name
+        FROM
+               product
+    ) as p
 
-ON oop.product_id = p.product_id
+    ON oop.product_id = p.product_id
 
-LEFT OUTER JOIN
+    LEFT OUTER JOIN
 
-(SELECT
-	pc.product_id,
-	pc.category_id,
-	c.name as category_name
-FROM product_to_category as pc
-	INNER JOIN category as c
-	  on pc.category_id = c.category_id
-WHERE c.language_id = 1) as pc
+    (SELECT
+        pc.product_id,
+        pc.category_id,
+        c.name as category_name
+    FROM product_to_category as pc
+        INNER JOIN category as c
+          on pc.category_id = c.category_id
+    WHERE c.language_id = 1) as pc
 
-ON pc.product_id = oop.product_id
-WHERE oop.Date >= '%s' and oop.Date <= '%s' and total >= %d
-GROUP BY oop.Date, pc.category_name, oop.product_id, p.product_name
-ORDER BY oop.Date desc, total DESC, pc.category_name, oop.product_id
-
+    ON pc.product_id = oop.product_id
+    WHERE oop.Date >= '%s' and oop.Date <= '%s'
+    GROUP BY oop.Date, pc.category_name, oop.product_id, p.product_name
+    ORDER BY oop.Date desc, total DESC, pc.category_name, oop.product_id
+) as final
+where lumpsum >= %d
     `
 	query := fmt.Sprintf(queryF,
 		"CAST(DATE_FORMAT(created_date,'%Y-%m-01') as DATE) AS OrderDate",

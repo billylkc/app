@@ -25,6 +25,10 @@ var wProductCmd = &cobra.Command{
 			return err
 		}
 
+		if nrecords >= 1 {
+			nrecords -= 1
+		}
+
 		d, err := util.ParseDateInput(date, "w")
 		if err != nil {
 			return err
