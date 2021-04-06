@@ -42,7 +42,7 @@ var productCmd = &cobra.Command{
 		}
 
 		data := util.InterfaceSlice(products)
-		headers := []string{"ID", "Name", "URL", "Price", "Listed_Price", "Discount", "Active"}
+		headers := []string{"ID", "Name", "URL", "Price", "Discount", "Listed_Price", "Active"}
 		ignores := []string{"Code"}
 		fmt.Printf("\nProduct Details\n\n")
 		err = util.PrintTable(data, headers, ignores, 1)
