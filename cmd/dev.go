@@ -9,8 +9,8 @@ import (
 // devCmd represents the dev command
 var devCmd = &cobra.Command{
 	Use:   "dev",
-	Short: "For development purpose.",
-	Long:  `For development purpose.`,
+	Short: "[ ] For development purpose.",
+	Long:  `[ ] For development purpose.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// var s string
 		// if len(args) > 0 {

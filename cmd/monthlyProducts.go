@@ -11,12 +11,12 @@ import (
 // mProductsCmd represents the dailyProducts command
 var mProductCmd = &cobra.Command{
 	Use:     "products",
-	Short:   "Monthly products.",
-	Long:    `Monthly products.`,
+	Short:   "[p] Monthly products.",
+	Long:    `[p] Monthly products.`,
 	Aliases: []string{"p"},
 	Example: `
   app monthly products -d "2020-03-25"
-  app montly products 1 2 (Starting from one day ago, return two records)
+  app m p 1 2 (Starting from one day ago, return two records)
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 

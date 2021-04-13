@@ -8,8 +8,8 @@ import (
 
 var dCmd = &cobra.Command{
 	Use:     "daily",
-	Short:   "Collection of daily query",
-	Long:    `Collection of daily query`,
+	Short:   "[d] Collection of daily queries",
+	Long:    `[d] Collection of daily queries`,
 	Aliases: []string{"d"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {

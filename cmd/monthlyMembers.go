@@ -10,11 +10,14 @@ import (
 
 // dMembersCmd represents the daily members command
 var mMembersCmd = &cobra.Command{
-	Use:     "members",
-	Short:   "Monthly member spending.",
-	Long:    `Monthly member spending.`,
+	Use:     "members [-d date] [previous] [nrecords]",
+	Short:   "[m] Monthly member spending.",
+	Long:    `[m] Monthly member spending.`,
 	Aliases: []string{"m"},
-	Example: `  app monthly members -d "2021-03-01"`,
+	Example: `
+  app monthly members -d "2021-03-01"
+  app m m 0 1
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		err := util.HandleDateArgs(&date, &nrecords, 1, args...)

@@ -14,13 +14,12 @@ import (
 
 // tMembersCmd represents the topMembers command
 var tMembersCmd = &cobra.Command{
-	Use:     "members",
-	Short:   "Top selling members in monthly view.",
-	Long:    `Top selling members in monthly view.`,
+	Use:     "members [nrecords]",
+	Short:   "[m] Top selling members in monthly view.",
+	Long:    `[m] Top selling members in monthly view.`,
 	Aliases: []string{"m"},
 	Example: `
   app top members 10
-
   app t m 10
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {

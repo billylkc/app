@@ -12,11 +12,14 @@ import (
 
 // productCmd represents the product command
 var productCmd = &cobra.Command{
-	Use:     "product",
-	Short:   "Query the performance of individual product.",
-	Long:    `Query the performance of individual product.`,
+	Use:     "product [id]",
+	Short:   "[p] Query the performance of individual product.",
+	Long:    `[p] Query the performance of individual product.`,
 	Aliases: []string{"p"},
-	Example: `  app query product 177976`,
+	Example: `
+  app query product 177976
+  app q p 177976
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var (
 			id  int

@@ -9,8 +9,8 @@ import (
 // topCmd represents the top command
 var tCmd = &cobra.Command{
 	Use:     "top",
-	Short:   "Top sales for members, products, etc..",
-	Long:    `Top sales for members, products, etc..`,
+	Short:   "[t] Top sales for members, products, etc..",
+	Long:    `[t] Top sales for members, products, etc..`,
 	Aliases: []string{"t"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {

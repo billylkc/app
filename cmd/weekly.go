@@ -7,9 +7,9 @@ import (
 )
 
 var wCmd = &cobra.Command{
-	Use:     "weekly",
-	Short:   "Collection of weekly query",
-	Long:    `Collection of weekly query`,
+	Use:     "weekly [-d date] [previous] [nrecords]",
+	Short:   "[w] Collection of weekly queries",
+	Long:    `[w] Collection of weekly queries`,
 	Aliases: []string{"w"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {

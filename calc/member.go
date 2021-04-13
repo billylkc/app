@@ -138,6 +138,7 @@ ORDER BY DATE DESC, TOTAL DESC
 }
 
 // GetWeeklyMember returns weekly member spendings
+// TODO: fix lumpsum
 func GetWeeklyMember(d string, n int) ([]MemberRecord, error) {
 	var records []MemberRecord
 	memberLimit = 200

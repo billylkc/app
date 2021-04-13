@@ -11,15 +11,23 @@ import (
 // wMembersCmd represents the weekly members command
 var wMembersCmd = &cobra.Command{
 	Use:     "members",
-	Short:   "Monthly member spending.",
-	Long:    `Monthly member spending.`,
+	Short:   "[w] Weekly member spending.",
+	Long:    `[w] Weekly member spending.`,
 	Aliases: []string{"m"},
-	Example: `  app monthly members -d "2021-03-01"`,
+	Example: `
+  app weekly members -d "2021-03-01"
+  app w m 0 2
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		err := util.HandleDateArgs(&date, &nrecords, 1, args...)
 		if err != nil {
 			return err
+		}
+
+		// As weekly will take the incomplete week, need to subtract one week to balance it out
+		if nrecords >= 1 {
+			nrecords -= 1
 		}
 
 		d, err := util.ParseDateInput(date, "w")

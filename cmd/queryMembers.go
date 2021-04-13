@@ -11,11 +11,14 @@ import (
 
 // membersCmd represents the members command
 var membersCmd = &cobra.Command{
-	Use:     "members",
-	Short:   "Query member purchase history.",
-	Long:    `Query member purchase history.`,
+	Use:     "members [name]",
+	Short:   "[m] Query member purchase history.",
+	Long:    `[m] Query member purchase history.`,
 	Aliases: []string{"m"},
-	Example: `  app query members Jimbelle`,
+	Example: `
+  app query members Jimbelle
+  app q m Jimbelle
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var s string
 		if len(args) > 0 {

@@ -10,11 +10,14 @@ import (
 
 // wSalesCmd represents the weeklyales command
 var wSalesCmd = &cobra.Command{
-	Use:     "sales",
-	Short:   "Weekly sales for the last n weeks.",
-	Long:    `Weekly sales for the last n weeks.`,
+	Use:     "sales [-d date] [previous] [nrecords]",
+	Short:   "[s] Weekly sales for the last n weeks.",
+	Long:    `[s] Weekly sales for the last n weeks.`,
 	Aliases: []string{"s"},
-	Example: `  app daily sales -d "2021-03-24"`,
+	Example: `
+  app weekly sales -d "2021-03-24"
+  app w s
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		err := util.HandleDateArgs(&date, &nrecords, 4, args...)

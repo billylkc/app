@@ -9,8 +9,8 @@ import (
 // queryCmd represents the query command
 var qCmd = &cobra.Command{
 	Use:     "query",
-	Short:   "Query product, members, etc",
-	Long:    `Query product, members, etc`,
+	Short:   "[q] Detailed query of products, members, etc",
+	Long:    `[q] Detailed query of products, members, etc`,
 	Aliases: []string{"q"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {

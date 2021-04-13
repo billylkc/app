@@ -8,8 +8,8 @@ import (
 
 var mCmd = &cobra.Command{
 	Use:     "monthly",
-	Short:   "Collection of monthly query",
-	Long:    `Collection of monthly query`,
+	Short:   "[m] Collection of monthly queries",
+	Long:    `[m] Collection of monthly queries`,
 	Aliases: []string{"m"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
