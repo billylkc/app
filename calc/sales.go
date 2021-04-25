@@ -75,16 +75,8 @@ func GetDailySales(start, end string) ([]SalesRecord, error) {
 }
 
 // GetWeeklySales returns the latest sales record for the past n weeks
-func GetWeeklySales(d string, n int) ([]SalesRecord, error) {
+func GetWeeklySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
-
-	// Parse start end date
-	t, err := now.Parse(d)
-	if err != nil {
-		return records, err
-	}
-	end := now.With(t).Format("2006-01-02")
-	start := t.AddDate(0, 0, -n*7).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {

@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
-	"github.com/billylkc/app/util"
+	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
 )
 
@@ -20,30 +21,29 @@ var wSalesCmd = &cobra.Command{
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := util.HandleDateArgs(&date, &nrecords, 4, args...)
+		err := myutil.HandleDateArgs(&date, &nrecords, 4, args...)
 		if err != nil {
 			return err
 		}
 
-		// As weekly will take the incomplete week, need to subtract one week to balance it out
-		if nrecords >= 1 {
-			nrecords -= 1
-		}
-
-		d, err := util.ParseDateInput(date, "w")
+		d, err := myutil.ParseDateInput(date, "w")
 		if err != nil {
 			return err
 		}
 
-		res, err := calc.GetWeeklySales(d, nrecords)
+		start, end, err := myutil.ParseDateRange(d, nrecords, "w")
+		fmt.Printf("nrecords: %+v\n", nrecords)
+		fmt.Printf("start: %+v\n", start)
+		fmt.Printf("end: %+v\n", end)
+		res, err := calc.GetWeeklySales(start, end)
 		if err != nil {
 			return err
 		}
 
 		headers := []string{"Date", "Count", "Total"}
 		ignores := []string{}
-		data := util.InterfaceSlice(res)
-		err = util.PrintTable(data, headers, ignores, 1)
+		data := myutil.InterfaceSlice(res)
+		err = myutil.PrintTable(data, headers, ignores, 1)
 		if err != nil {
 			return err
 		}
