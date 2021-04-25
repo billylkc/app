@@ -5,6 +5,7 @@ import (
 
 	"github.com/billylkc/app/calc"
 	"github.com/billylkc/app/util"
+	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
 )
 
@@ -21,17 +22,18 @@ var dSalesCmd = &cobra.Command{
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := util.HandleDateArgs(&date, &nrecords, 7, args...)
+		err := myutil.HandleDateArgs(&date, &nrecords, 7, args...)
 		if err != nil {
 			return err
 		}
 
-		d, err := util.ParseDateInput(date, "d")
+		d, err := myutil.ParseDateInput(date, "d")
 		if err != nil {
 			return err
 		}
 
-		res, err := calc.GetDailySales(d, nrecords)
+		start, end, err := myutil.ParseDateRange(d, nrecords, "d")
+		res, err := calc.GetDailySales(start, end)
 		if err != nil {
 			return err
 		}

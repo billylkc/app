@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 
+	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
 )
 
@@ -12,18 +14,19 @@ var devCmd = &cobra.Command{
 	Short: "[ ] For development purpose.",
 	Long:  `[ ] For development purpose.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// var s string
-		// if len(args) > 0 {
-		// 	s = strings.Join(args, " ")
-		// } else {
-		// 	return fmt.Errorf("not enough argumetns\n")
-		// }
-		// res, err := calc.FindMembers(s)
-		// if err != nil {
-		// 	return err
-		// }
+		err := myutil.HandleDateArgs(&date, &nrecords, 7, args...)
+		if err != nil {
+			return err
+		}
 
-		// fmt.Println(PrettyPrint(res))
+		d, err := myutil.ParseDateInput(date, "d")
+		if err != nil {
+			return err
+		}
+
+		start, end, err := myutil.ParseDateRange(d, nrecords, "d")
+		fmt.Println(start, end)
+
 		return nil
 	},
 }

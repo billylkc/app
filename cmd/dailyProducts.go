@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
 	"github.com/billylkc/app/util"
+	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
 )
 
@@ -20,17 +22,23 @@ var dProductCmd = &cobra.Command{
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := util.HandleDateArgs(&date, &nrecords, 1, args...)
+		err := myutil.HandleDateArgs(&date, &nrecords, 1, args...)
 		if err != nil {
 			return err
 		}
 
-		d, err := util.ParseDateInput(date, "d")
+		d, err := myutil.ParseDateInput(date, "d")
 		if err != nil {
 			return err
 		}
 
-		res, err := calc.GetDailyProduct(d, nrecords)
+		start, end, err := myutil.ParseDateRange(d, nrecords, "d")
+
+		fmt.Printf("nrecords: %+v\n", nrecords)
+		fmt.Printf("start: %+v\n", start)
+		fmt.Printf("end: %+v\n", end)
+
+		res, err := calc.GetDailyProduct(start, end)
 		if err != nil {
 			return err
 		}
