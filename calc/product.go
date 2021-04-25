@@ -35,17 +35,17 @@ type Product struct {
 var totalLimit int // Limit for printing popular Product
 
 // GetDailyProduct returns the latest product sales record for the past n days
-func GetDailyProduct(d string, n int) ([]ProductRecord, error) {
+func GetDailyProduct(start, end string) ([]ProductRecord, error) {
 	var records []ProductRecord
 	totalLimit = 100
 	fmt.Printf("\nShowing daily top products with sales larger than - %d \n\n", totalLimit)
+
 	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", d)
+	t, err := time.Parse("2006-01-02", end)
 	if err != nil {
 		return records, err
 	}
-	start := t.AddDate(0, 0, -n+1).Format("2006-01-02") // start date
-	end := t.AddDate(0, 0, 1).Format("2006-01-02")      // end date
+	end = t.AddDate(0, 0, 1).Format("2006-01-02") // end date
 
 	db, err := database.GetConnection()
 	if err != nil {
