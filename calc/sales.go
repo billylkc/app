@@ -23,12 +23,12 @@ func GetDailySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
 
 	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", start)
+	t, err := time.Parse("2006-01-02", end)
 	if err != nil {
 		return records, err
 	}
-	start = t.AddDate(0, 0, 1).Format("2006-01-02")
 
+	end = t.AddDate(0, 0, 1).Format("2006-01-02")
 	db, err := database.GetConnection()
 	if err != nil {
 		return records, err
@@ -48,10 +48,8 @@ func GetDailySales(start, end string) ([]SalesRecord, error) {
         DATE(created_date)
     ORDER BY
         created_date DESC
-    LIMIT %d
     `
 	query := fmt.Sprintf(queryF, "`order`", start, end)
-
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {
