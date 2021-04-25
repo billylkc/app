@@ -3,7 +3,7 @@ module github.com/billylkc/app
 go 1.16
 
 require (
-	github.com/billylkc/myutil v0.1.10
+	github.com/billylkc/myutil v0.1.13
 	github.com/dustin/go-humanize v1.0.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jedib0t/go-pretty/v6 v6.2.1

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
@@ -32,9 +31,6 @@ var wSalesCmd = &cobra.Command{
 		}
 
 		start, end, err := myutil.ParseDateRange(d, nrecords, "w")
-		fmt.Printf("nrecords: %+v\n", nrecords)
-		fmt.Printf("start: %+v\n", start)
-		fmt.Printf("end: %+v\n", end)
 		res, err := calc.GetWeeklySales(start, end)
 		if err != nil {
 			return err
