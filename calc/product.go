@@ -221,18 +221,10 @@ WHERE lumpsum >= %d
 }
 
 // GetMonthlyProduct returns the latest product sales record for the past n months
-func GetMonthlyProduct(d string, n int) ([]ProductRecord, error) {
+func GetMonthlyProduct(start, end string) ([]ProductRecord, error) {
 	var records []ProductRecord
 	totalLimit = 1000
 	fmt.Printf("\nShowing monthly top products with sales larger than - %d \n\n", totalLimit)
-
-	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", d)
-	if err != nil {
-		return records, err
-	}
-	start := t.AddDate(0, -n, 0).Format("2006-01-02") // start date
-	end := t.Format("2006-01-02")                     // end date
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -304,7 +296,6 @@ where lumpsum >= %d
 		start,
 		end,
 		totalLimit)
-
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {
