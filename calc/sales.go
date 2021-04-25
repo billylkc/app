@@ -7,7 +7,6 @@ import (
 
 	"github.com/billylkc/app/database"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/now"
 	"github.com/pkg/errors"
 )
 
@@ -130,16 +129,8 @@ ORDER BY DATE DESC
 }
 
 // GetMonthlySales returns the latest sales record for the past n months
-func GetMonthlySales(d string, n int) ([]SalesRecord, error) {
+func GetMonthlySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
-
-	// Parse start end date
-	t, err := now.Parse(d)
-	if err != nil {
-		return records, err
-	}
-	end := now.With(t).EndOfMonth().Format("2006-01-02")
-	start := t.AddDate(0, -n+1, 0).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {
