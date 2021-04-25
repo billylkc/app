@@ -7,7 +7,6 @@ import (
 
 	"github.com/billylkc/app/database"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/now"
 	"github.com/pkg/errors"
 	"github.com/sahilm/fuzzy"
 )
@@ -52,17 +51,16 @@ func (m members) Len() int {
 }
 
 // GetDailyMember returns daily member spendings
-func GetDailyMember(d string, n int) ([]MemberRecord, error) {
+func GetDailyMember(start, end string) ([]MemberRecord, error) {
 	var records []MemberRecord
 	memberLimit = 50
 
 	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", d)
+	t, err := time.Parse("2006-01-02", end)
 	if err != nil {
 		return records, err
 	}
-	start := t.AddDate(0, 0, -n+1).Format("2006-01-02") // start date
-	end := t.AddDate(0, 0, 1).Format("2006-01-02")      // end date
+	end = t.AddDate(0, 0, 1).Format("2006-01-02") // end date
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -139,17 +137,9 @@ ORDER BY DATE DESC, TOTAL DESC
 
 // GetWeeklyMember returns weekly member spendings
 // TODO: fix lumpsum
-func GetWeeklyMember(d string, n int) ([]MemberRecord, error) {
+func GetWeeklyMember(start, end string) ([]MemberRecord, error) {
 	var records []MemberRecord
 	memberLimit = 200
-
-	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", d)
-	if err != nil {
-		return records, err
-	}
-	end := now.With(t).Format("2006-01-02")
-	start := t.AddDate(0, 0, -n*7).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -236,18 +226,10 @@ ORDER BY DATE DESC, TOTAL DESC
 	return records, nil
 }
 
-// GetMonthlyMember returns daily member spendings
-func GetMonthlyMember(d string, n int) ([]MemberRecord, error) {
+// GetMonthlyMember returns monthly member spendings
+func GetMonthlyMember(start, end string) ([]MemberRecord, error) {
 	var records []MemberRecord
 	memberLimit = 1000
-
-	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", d)
-	if err != nil {
-		return records, err
-	}
-	end := now.With(t).EndOfMonth().Format("2006-01-02")
-	start := t.AddDate(0, -n+1, 0).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {

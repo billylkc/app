@@ -7,7 +7,6 @@ import (
 
 	"github.com/billylkc/app/database"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/now"
 	"github.com/pkg/errors"
 )
 
@@ -23,12 +22,12 @@ func GetDailySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
 
 	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", start)
+	t, err := time.Parse("2006-01-02", end)
 	if err != nil {
 		return records, err
 	}
-	start = t.AddDate(0, 0, 1).Format("2006-01-02")
 
+	end = t.AddDate(0, 0, 1).Format("2006-01-02")
 	db, err := database.GetConnection()
 	if err != nil {
 		return records, err
@@ -48,10 +47,8 @@ func GetDailySales(start, end string) ([]SalesRecord, error) {
         DATE(created_date)
     ORDER BY
         created_date DESC
-    LIMIT %d
     `
 	query := fmt.Sprintf(queryF, "`order`", start, end)
-
 	results, err := db.Query(query)
 	defer results.Close()
 	if err != nil {
@@ -77,16 +74,8 @@ func GetDailySales(start, end string) ([]SalesRecord, error) {
 }
 
 // GetWeeklySales returns the latest sales record for the past n weeks
-func GetWeeklySales(d string, n int) ([]SalesRecord, error) {
+func GetWeeklySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
-
-	// Parse start end date
-	t, err := now.Parse(d)
-	if err != nil {
-		return records, err
-	}
-	end := now.With(t).Format("2006-01-02")
-	start := t.AddDate(0, 0, -n*7).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -140,16 +129,8 @@ ORDER BY DATE DESC
 }
 
 // GetMonthlySales returns the latest sales record for the past n months
-func GetMonthlySales(d string, n int) ([]SalesRecord, error) {
+func GetMonthlySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
-
-	// Parse start end date
-	t, err := now.Parse(d)
-	if err != nil {
-		return records, err
-	}
-	end := now.With(t).EndOfMonth().Format("2006-01-02")
-	start := t.AddDate(0, -n+1, 0).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {

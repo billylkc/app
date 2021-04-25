@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/billylkc/app/calc"
-	"github.com/billylkc/app/util"
+	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
 )
 
@@ -20,25 +20,26 @@ var mSalesCmd = &cobra.Command{
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := util.HandleDateArgs(&date, &nrecords, 1, args...)
+		err := myutil.HandleDateArgs(&date, &nrecords, 1, args...)
 		if err != nil {
 			return err
 		}
 
-		d, err := util.ParseDateInput(date, "m")
+		d, err := myutil.ParseDateInput(date, "m")
 		if err != nil {
 			return err
 		}
 
-		res, err := calc.GetMonthlySales(d, nrecords)
+		start, end, err := myutil.ParseDateRange(d, nrecords, "m")
+		res, err := calc.GetMonthlySales(start, end)
 		if err != nil {
 			return err
 		}
 
 		headers := []string{"Date", "Count", "Total"}
 		ignores := []string{}
-		data := util.InterfaceSlice(res)
-		err = util.PrintTable(data, headers, ignores, 3)
+		data := myutil.InterfaceSlice(res)
+		err = myutil.PrintTable(data, headers, ignores, 3)
 		if err != nil {
 			return err
 		}

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
@@ -33,11 +32,6 @@ var dProductCmd = &cobra.Command{
 		}
 
 		start, end, err := myutil.ParseDateRange(d, nrecords, "d")
-
-		fmt.Printf("nrecords: %+v\n", nrecords)
-		fmt.Printf("start: %+v\n", start)
-		fmt.Printf("end: %+v\n", end)
-
 		res, err := calc.GetDailyProduct(start, end)
 		if err != nil {
 			return err
