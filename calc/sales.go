@@ -19,15 +19,15 @@ type SalesRecord struct {
 }
 
 // GetDailySales returns the latest sales record for the past n days
-func GetDailySales(d string, n int) ([]SalesRecord, error) {
+func GetDailySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
 
 	// handle stupid date, add one day before query
-	t, err := time.Parse("2006-01-02", d)
+	t, err := time.Parse("2006-01-02", start)
 	if err != nil {
 		return records, err
 	}
-	d = t.AddDate(0, 0, 1).Format("2006-01-02")
+	start = t.AddDate(0, 0, 1).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -42,6 +42,7 @@ func GetDailySales(d string, n int) ([]SalesRecord, error) {
     FROM
         %s
     WHERE
+        created_date >= '%s' AND
         created_date <= '%s'
     GROUP BY
         DATE(created_date)
@@ -49,7 +50,7 @@ func GetDailySales(d string, n int) ([]SalesRecord, error) {
         created_date DESC
     LIMIT %d
     `
-	query := fmt.Sprintf(queryF, "`order`", d, n)
+	query := fmt.Sprintf(queryF, "`order`", start, end)
 
 	results, err := db.Query(query)
 	defer results.Close()
