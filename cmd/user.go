@@ -14,7 +14,7 @@ var userCmd = &cobra.Command{
 	Aliases: []string{"u"},
 	Example: `
   app user new
-  app user country
+  app user paid
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
