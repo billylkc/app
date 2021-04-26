@@ -19,7 +19,6 @@ var dSalesCmd = &cobra.Command{
   app daily sales -d "2021-03-24"
   app d s 0 5
 `,
-
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		err := myutil.HandleDateArgs(&date, &nrecords, 7, args...)
