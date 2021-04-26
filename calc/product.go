@@ -130,6 +130,13 @@ func GetWeeklyProduct(start, end string) ([]ProductRecord, error) {
 	totalLimit = 500
 	fmt.Printf("\nShowing weekly top products with sales larger than - %d \n\n", totalLimit)
 
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return records, err
+	}
+	end = t.AddDate(0, 0, 1).Format("2006-01-02") // end date
+
 	db, err := database.GetConnection()
 	if err != nil {
 		return records, err
@@ -225,6 +232,13 @@ func GetMonthlyProduct(start, end string) ([]ProductRecord, error) {
 	var records []ProductRecord
 	totalLimit = 1000
 	fmt.Printf("\nShowing monthly top products with sales larger than - %d \n\n", totalLimit)
+
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return records, err
+	}
+	end = t.AddDate(0, 0, 1).Format("2006-01-02") // end date
 
 	db, err := database.GetConnection()
 	if err != nil {

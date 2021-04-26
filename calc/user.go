@@ -16,8 +16,17 @@ type MemberCount struct {
 	Count   int
 }
 
+// GetPaidUserCount gets paid user per month
 func GetPaidUserCount(start, end string) ([]MemberCount, error) {
 	var records []MemberCount
+
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return records, err
+	}
+	end = t.AddDate(0, 0, 1).Format("2006-01-02") // end date
+
 	db, err := database.GetConnection()
 	if err != nil {
 		return records, err
@@ -77,7 +86,7 @@ ORDER BY DATE DESC
 	return records, nil
 }
 
-// GetNewUserCount gets the total of new user count by country per each week
+// GetNewUserCount gets the total of new user count by country per month
 func GetNewUserCount(start, end string) ([]MemberCount, error) {
 	var records []MemberCount
 

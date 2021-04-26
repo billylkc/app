@@ -136,10 +136,16 @@ ORDER BY DATE DESC, TOTAL DESC
 }
 
 // GetWeeklyMember returns weekly member spendings
-// TODO: fix lumpsum
 func GetWeeklyMember(start, end string) ([]MemberRecord, error) {
 	var records []MemberRecord
 	memberLimit = 200
+
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return records, err
+	}
+	end = t.AddDate(0, 0, 1).Format("2006-01-02") // end date
 
 	db, err := database.GetConnection()
 	if err != nil {
@@ -230,6 +236,13 @@ ORDER BY DATE DESC, TOTAL DESC
 func GetMonthlyMember(start, end string) ([]MemberRecord, error) {
 	var records []MemberRecord
 	memberLimit = 1000
+
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return records, err
+	}
+	end = t.AddDate(0, 0, 1).Format("2006-01-02") // end date
 
 	db, err := database.GetConnection()
 	if err != nil {

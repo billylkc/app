@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/billylkc/app/calc"
-	"github.com/billylkc/app/util"
 	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
 )
@@ -39,8 +38,8 @@ var dSalesCmd = &cobra.Command{
 
 		headers := []string{"Date", "Count", "Total"}
 		ignores := []string{}
-		data := util.InterfaceSlice(res)
-		err = util.PrintTable(data, headers, ignores, 1)
+		data := myutil.InterfaceSlice(res)
+		err = myutil.PrintTable(data, headers, ignores, 1)
 		if err != nil {
 			return err
 		}
