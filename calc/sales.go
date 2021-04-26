@@ -77,6 +77,14 @@ func GetDailySales(start, end string) ([]SalesRecord, error) {
 func GetWeeklySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
 
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return records, err
+	}
+
+	end = t.AddDate(0, 0, 1).Format("2006-01-02")
+
 	db, err := database.GetConnection()
 	if err != nil {
 		return records, err
@@ -92,9 +100,11 @@ FROM
 		CAST(SUBDATE(created_date, WEEKDAY(created_date)) AS DATE) AS DATE,
         TOTAL
     FROM %s as op
+    WHERE
+        created_date >= '%s' AND
+        created_date <= '%s'
 	ORDER BY order_id desc
 	) as oop
-WHERE DATE >= '%s' AND DATE <= '%s'
 GROUP BY
 	DATE
 ORDER BY DATE DESC
@@ -131,6 +141,13 @@ ORDER BY DATE DESC
 // GetMonthlySales returns the latest sales record for the past n months
 func GetMonthlySales(start, end string) ([]SalesRecord, error) {
 	var records []SalesRecord
+
+	// handle stupid date, add one day before query
+	t, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return records, err
+	}
+	end = t.AddDate(0, 0, 1).Format("2006-01-02")
 
 	db, err := database.GetConnection()
 	if err != nil {

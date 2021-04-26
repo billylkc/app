@@ -16,6 +16,67 @@ type MemberCount struct {
 	Count   int
 }
 
+func GetPaidUserCount(start, end string) ([]MemberCount, error) {
+	var records []MemberCount
+	db, err := database.GetConnection()
+	if err != nil {
+		return records, err
+	}
+
+	queryF := `
+SELECT
+	DATE,
+	COUNT(1) as Count
+FROM
+(
+	SELECT
+		DATE,
+		CUSTOMER_ID,
+		count(1) as count
+	FROM (
+	SELECT
+		%s,
+		customer_id
+	FROM
+		%s
+	WHERE
+		created_date >= '%s' and created_date <= '%s'
+
+	) AS o
+	GROUP BY
+		DATE, CUSTOMER_ID
+	ORDER BY
+		DATE DESC
+) as oo
+GROUP BY DATE
+ORDER BY DATE DESC
+`
+	query := fmt.Sprintf(queryF,
+		"CAST(DATE_FORMAT(created_date,'%Y-%m-01') as DATE) as DATE",
+		"`order`",
+		start,
+		end)
+	results, err := db.Query(query)
+	defer results.Close()
+	if err != nil {
+		return records, errors.Wrap(err, "cant execute query")
+	}
+	for results.Next() {
+		var rec MemberCount
+		err = results.Scan(&rec.Date, &rec.Count)
+		if err != nil {
+			panic(err.Error())
+		}
+		records = append(records, rec)
+	}
+
+	// Sort the stupid slice, desc
+	sort.Slice(records, func(i, j int) bool {
+		return records[j].Date.Before(records[i].Date)
+	})
+	return records, nil
+}
+
 // GetNewUserCount gets the total of new user count by country per each week
 func GetNewUserCount(start, end string) ([]MemberCount, error) {
 	var records []MemberCount
@@ -58,7 +119,7 @@ ORDER BY DATE DESC, l.SHORT_NAME
 		var rec MemberCount
 		err = results.Scan(&rec.Date, &rec.Country, &rec.Count)
 		if err != nil {
-			panic(err.Error()) // proper error handling instead of panic in your app
+			panic(err.Error())
 		}
 		records = append(records, rec)
 	}
