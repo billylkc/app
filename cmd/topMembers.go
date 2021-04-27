@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/billylkc/app/calc"
+	"github.com/billylkc/myutil"
 	"github.com/dustin/go-humanize"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
@@ -41,12 +42,17 @@ var tMembersCmd = &cobra.Command{
 			}
 		}
 
+		start, err := myutil.HandleMonthArgs(month)
+		if err != nil {
+			return err
+		}
+
 		type Record struct {
 			Date  string
 			Sales int
 		}
 
-		topMembers, err := calc.GetTopMembers(nrecords)
+		topMembers, err := calc.GetTopMembers(start, nrecords)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -111,4 +117,5 @@ var tMembersCmd = &cobra.Command{
 
 func init() {
 	tCmd.AddCommand(tMembersCmd)
+	tMembersCmd.Flags().StringVarP(&month, "month", "m", "", "Starting month. Default None.")
 }
