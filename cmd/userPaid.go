@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/billylkc/app/calc"
 	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
@@ -35,6 +37,8 @@ var userPaidCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Printf("\nPaying Users by month \n\n")
 		headers := []string{"Date", "Unique Members"}
 		ignores := []string{"Country"}
 		data := myutil.InterfaceSlice(res)

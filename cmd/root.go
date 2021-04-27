@@ -15,6 +15,7 @@ var (
 	cfgFile  string
 	date     string // date in YYYY-MM-DD format, or past n days/weeks/months
 	nrecords int
+	month    string // months in short form (e,g, apr), or numeric number
 )
 
 // rootCmd represents the base command when called without any subcommands

@@ -470,12 +470,19 @@ func GetPurchaseHistory(s string) ([]PurchaseHistory, []PurchaseHistory, error) 
 	return md, ph, nil
 }
 
-func GetTopMembers(nrecords int) (map[int][]MonthlySales, error) {
+func GetTopMembers(start string, nrecords int) (map[int][]MonthlySales, error) {
 	m := make(map[int][]MonthlySales)
 
 	db, err := database.GetConnection()
 	if err != nil {
 		return m, err
+	}
+
+	var where string // where clause for query
+	if start != "" {
+		where = fmt.Sprintf(" WHERE CUSTOMER_ID is not null AND created_date >= \"%s\" ", start)
+	} else {
+		where = " WHERE CUSTOMER_ID is not null "
 	}
 
 	queryF := `
@@ -496,7 +503,9 @@ FROM
 					%s,
 					CUSTOMER_ID,
 					Total
-			FROM order_product) as day
+			FROM order_product
+            %s
+            ) as day
 	GROUP BY DATE, CUSTOMER_ID
 ) as op
 
@@ -509,8 +518,8 @@ FROM (
 		sum(total) as GrandTotal
 	FROM
 		order_product
-	WHERE
-		customer_id is not null
+    %s
+
 	GROUP BY
 		customer_id
 	ORDER BY
@@ -529,6 +538,8 @@ order by rank, YearMonth desc, MonthTotal desc
 	query := fmt.Sprintf(queryF,
 		"DATE_FORMAT(DATE,'%Y-%m') as YearMonth",
 		"CAST(DATE_FORMAT(order_product.created_date,'%Y-%m-01') as DATE) as DATE",
+		where,
+		where,
 		nrecords,
 	)
 	results, err := db.Query(query)

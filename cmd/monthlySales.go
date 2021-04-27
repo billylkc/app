@@ -20,7 +20,7 @@ var mSalesCmd = &cobra.Command{
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		err := myutil.HandleDateArgs(&date, &nrecords, 1, args...)
+		err := myutil.HandleDateArgs(&date, &nrecords, 4, args...)
 		if err != nil {
 			return err
 		}
