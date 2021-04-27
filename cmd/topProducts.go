@@ -113,4 +113,5 @@ var tProductsCmd = &cobra.Command{
 
 func init() {
 	tCmd.AddCommand(tProductsCmd)
+	tProductsCmd.Flags().StringVarP(&month, "month", "m", "0", "Starting month")
 }
