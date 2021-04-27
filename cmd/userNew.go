@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/billylkc/app/calc"
 	"github.com/billylkc/myutil"
 	"github.com/spf13/cobra"
@@ -35,6 +37,8 @@ var userNewCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		fmt.Printf("\nNew Users per language by month \n\n")
 		headers := []string{"Date", "Country", "Count"}
 		ignores := []string{}
 		data := myutil.InterfaceSlice(res)
