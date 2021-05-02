@@ -1,6 +1,7 @@
 package util
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
@@ -66,6 +67,44 @@ func TestParseDateInput(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("ParseDateInput() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGenerateDate(t *testing.T) {
+	type args struct {
+		start string
+		end   string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []string
+		wantErr bool
+	}{
+		{
+			name: "Simple test",
+			args: args{
+				start: "2019-02-20",
+				end:   "2019-02-22",
+			},
+			want: []string{
+				"2019-02-20",
+				"2019-02-21",
+				"2019-02-22",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GenerateDate(tt.args.start, tt.args.end)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GenerateDate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateDate() = %v, want %v", got, tt.want)
 			}
 		})
 	}

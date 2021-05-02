@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -205,4 +206,30 @@ func PrintTable(data []interface{}, headers, ignore []string, colMerge int) erro
 	t.Style().Options.SeparateRows = true
 	t.Render()
 	return nil
+}
+
+// GenerateDate
+func GenerateDate(start, end string) ([]string, error) {
+	var (
+		res []string
+		t   time.Time
+	)
+	t1, err := now.Parse(start)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	t2, err := now.Parse(end)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	t = t1
+	for t.Before(t2) {
+		s := t.Format("2006-01-02")
+		t = t.AddDate(0, 0, 1)
+		res = append(res, s)
+	}
+	sort.Strings(res)
+
+	return res, nil
 }
