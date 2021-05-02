@@ -76,6 +76,7 @@ func TestGenerateDate(t *testing.T) {
 	type args struct {
 		start string
 		end   string
+		freq  string
 	}
 	tests := []struct {
 		name    string
@@ -88,17 +89,17 @@ func TestGenerateDate(t *testing.T) {
 			args: args{
 				start: "2019-02-20",
 				end:   "2019-02-22",
+				freq:  "d",
 			},
 			want: []string{
 				"2019-02-20",
 				"2019-02-21",
-				"2019-02-22",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GenerateDate(tt.args.start, tt.args.end)
+			got, err := GenerateDate(tt.args.start, tt.args.end, tt.args.freq)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GenerateDate() error = %v, wantErr %v", err, tt.wantErr)
 				return

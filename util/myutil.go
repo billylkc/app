@@ -209,7 +209,7 @@ func PrintTable(data []interface{}, headers, ignore []string, colMerge int) erro
 }
 
 // GenerateDate
-func GenerateDate(start, end string) ([]string, error) {
+func GenerateDate(start, end, freq string) ([]string, error) {
 	var (
 		res []string
 		t   time.Time
@@ -224,12 +224,23 @@ func GenerateDate(start, end string) ([]string, error) {
 		fmt.Println(err.Error())
 	}
 	t = t1
-	for t.Before(t2) {
-		s := t.Format("2006-01-02")
-		t = t.AddDate(0, 0, 1)
-		res = append(res, s)
+	switch freq {
+	case "d":
+		for t.Before(t2) {
+			s := t.Format("2006-01-02")
+			t = t.AddDate(0, 0, 1)
+			res = append(res, s)
+		}
+	case "w":
+		// pass
+
+	case "m":
+		// pass
+
+	default:
+		// pass
+
 	}
 	sort.Strings(res)
-
 	return res, nil
 }

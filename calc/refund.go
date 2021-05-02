@@ -81,7 +81,7 @@ ORDER BY
 	}
 
 	// Fill dates with empty records
-	ss, err := util.GenerateDate(start, end)
+	ss, err := util.GenerateDate(start, end, "d")
 	if err != nil {
 		return records, err
 	}
