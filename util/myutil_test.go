@@ -108,6 +108,20 @@ func TestGenerateDate(t *testing.T) {
 				"2021-05-10",
 			},
 		},
+		{
+			name: "Simple test - month",
+			args: args{
+				start: "2021-02-01",
+				end:   "2021-05-31",
+				freq:  "m",
+			},
+			want: []string{
+				"2021-02-01",
+				"2021-03-01",
+				"2021-04-01",
+				"2021-05-01",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

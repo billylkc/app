@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/billylkc/app/calc"
@@ -34,6 +35,8 @@ var mRefundCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		fmt.Println(start)
+		fmt.Println(end)
 
 		headers := []string{"Date", "Count", "Total"}
 		ignores := []string{}

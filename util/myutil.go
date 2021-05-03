@@ -240,10 +240,16 @@ func GenerateDate(start, end, freq string) ([]string, error) {
 		}
 
 	case "m":
-		// pass
+		t1 = now.With(t1).BeginningOfMonth() // force start day to be first of month
+		t = t1
+		for t.Before(t2) {
+			s := t.Format("2006-01-02")
+			t = t.AddDate(0, 1, 0)
+			res = append(res, s)
+		}
 
 	default:
-		// pass
+		return res, fmt.Errorf("Invalid frequency format %s. Expect d/w/m \n", freq)
 
 	}
 	sort.Strings(res)
