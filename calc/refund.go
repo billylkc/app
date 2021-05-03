@@ -103,3 +103,13 @@ ORDER BY
 
 	return records, nil
 }
+
+func GetWeeklyRefund(start, end string) ([]RefundRecord, error) {
+	var records []RefundRecord
+	return records, nil
+}
+
+func GetMonthlyRefund(start, end string) ([]RefundRecord, error) {
+	var records []RefundRecord
+	return records, nil
+}

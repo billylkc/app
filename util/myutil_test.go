@@ -85,7 +85,7 @@ func TestGenerateDate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Simple test",
+			name: "Simple test - day",
 			args: args{
 				start: "2019-02-20",
 				end:   "2019-02-22",
@@ -94,6 +94,18 @@ func TestGenerateDate(t *testing.T) {
 			want: []string{
 				"2019-02-20",
 				"2019-02-21",
+			},
+		},
+		{
+			name: "Simple test - week",
+			args: args{
+				start: "2021-05-03",
+				end:   "2021-05-17",
+				freq:  "w",
+			},
+			want: []string{
+				"2021-05-03",
+				"2021-05-17",
 			},
 		},
 	}
