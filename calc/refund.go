@@ -153,8 +153,8 @@ ORDER BY DATE DESC
 		return records, errors.Wrap(err, "cant execute query")
 	}
 
-	// var md map[string]bool // List of days with records
-	// md = make(map[string]bool)
+	var md map[string]bool // List of days with records
+	md = make(map[string]bool)
 	for results.Next() {
 		var rec RefundRecord
 		err = results.Scan(&rec.Date, &rec.Count, &rec.Total)
@@ -162,8 +162,28 @@ ORDER BY DATE DESC
 			return records, err
 		}
 		records = append(records, rec)
-		// md[rec.Date.Format("2006-01-02")] = true
+		md[rec.Date.Format("2006-01-02")] = true
 	}
+
+	// Fill dates with empty records
+	ss, err := util.GenerateDate(start, end, "w")
+	if err != nil {
+		return records, err
+	}
+	for _, s := range ss {
+		if _, ok := md[s]; !ok {
+			tt := now.MustParse(s)
+			r := RefundRecord{
+				Date: tt,
+			}
+			records = append(records, r)
+		}
+
+	}
+	// Sort the stupid slice, desc
+	sort.Slice(records, func(i, j int) bool {
+		return records[j].Date.Before(records[i].Date)
+	})
 
 	return records, nil
 }

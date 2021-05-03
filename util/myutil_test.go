@@ -105,7 +105,7 @@ func TestGenerateDate(t *testing.T) {
 			},
 			want: []string{
 				"2021-05-03",
-				"2021-05-17",
+				"2021-05-10",
 			},
 		},
 	}

@@ -208,7 +208,8 @@ func PrintTable(data []interface{}, headers, ignore []string, colMerge int) erro
 	return nil
 }
 
-// GenerateDate
+// GenerateDate generates list of days with input with start and end date (exclusive)
+// handles frequency likes  (d)ate, (w)eek, (m)onth
 func GenerateDate(start, end, freq string) ([]string, error) {
 	var (
 		res []string
@@ -232,7 +233,11 @@ func GenerateDate(start, end, freq string) ([]string, error) {
 			res = append(res, s)
 		}
 	case "w":
-		// pass
+		for t.Before(t2) {
+			s := t.Format("2006-01-02")
+			t = t.AddDate(0, 0, 7)
+			res = append(res, s)
+		}
 
 	case "m":
 		// pass
