@@ -103,7 +103,6 @@ FROM
     WHERE
         created_date >= '%s' AND
         created_date <= '%s'
-	ORDER BY order_id desc
 	) as oop
 GROUP BY
 	DATE

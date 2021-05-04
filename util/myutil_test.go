@@ -1,6 +1,7 @@
 package util
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
@@ -66,6 +67,71 @@ func TestParseDateInput(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("ParseDateInput() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGenerateDate(t *testing.T) {
+	type args struct {
+		start string
+		end   string
+		freq  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []string
+		wantErr bool
+	}{
+		{
+			name: "Simple test - day",
+			args: args{
+				start: "2019-02-20",
+				end:   "2019-02-22",
+				freq:  "d",
+			},
+			want: []string{
+				"2019-02-20",
+				"2019-02-21",
+			},
+		},
+		{
+			name: "Simple test - week",
+			args: args{
+				start: "2021-05-03",
+				end:   "2021-05-17",
+				freq:  "w",
+			},
+			want: []string{
+				"2021-05-03",
+				"2021-05-10",
+			},
+		},
+		{
+			name: "Simple test - month",
+			args: args{
+				start: "2021-02-01",
+				end:   "2021-05-31",
+				freq:  "m",
+			},
+			want: []string{
+				"2021-02-01",
+				"2021-03-01",
+				"2021-04-01",
+				"2021-05-01",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GenerateDate(tt.args.start, tt.args.end, tt.args.freq)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GenerateDate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateDate() = %v, want %v", got, tt.want)
 			}
 		})
 	}

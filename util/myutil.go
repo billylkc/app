@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -205,4 +206,52 @@ func PrintTable(data []interface{}, headers, ignore []string, colMerge int) erro
 	t.Style().Options.SeparateRows = true
 	t.Render()
 	return nil
+}
+
+// GenerateDate generates list of days with input with start and end date (exclusive)
+// handles frequency likes  (d)ate, (w)eek, (m)onth
+func GenerateDate(start, end, freq string) ([]string, error) {
+	var (
+		res []string
+		t   time.Time
+	)
+	t1, err := now.Parse(start)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	t2, err := now.Parse(end)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	t = t1
+	switch freq {
+	case "d":
+		for t.Before(t2) {
+			s := t.Format("2006-01-02")
+			t = t.AddDate(0, 0, 1)
+			res = append(res, s)
+		}
+	case "w":
+		for t.Before(t2) {
+			s := t.Format("2006-01-02")
+			t = t.AddDate(0, 0, 7)
+			res = append(res, s)
+		}
+
+	case "m":
+		t1 = now.With(t1).BeginningOfMonth() // force start day to be first of month
+		t = t1
+		for t.Before(t2) {
+			s := t.Format("2006-01-02")
+			t = t.AddDate(0, 1, 0)
+			res = append(res, s)
+		}
+
+	default:
+		return res, fmt.Errorf("Invalid frequency format %s. Expect d/w/m \n", freq)
+
+	}
+	sort.Strings(res)
+	return res, nil
 }
