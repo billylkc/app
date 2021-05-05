@@ -9,8 +9,8 @@ import (
 // generateCmd represents the generate command
 var generateCmd = &cobra.Command{
 	Use:     "generate",
-	Short:   "[g] Experimental. Generate help command, reports, etc.",
-	Long:    `[g] Experimental. Generate help command, reports, etc.`,
+	Short:   "[g] Experimental. Generate help commands, reports, etc.",
+	Long:    `[g] Experimental. Generate help commands, reports, etc.`,
 	Aliases: []string{"g"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {

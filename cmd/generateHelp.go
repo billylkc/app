@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/billylkc/app/app"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +18,11 @@ var gHelpCmd = &cobra.Command{
   app g h
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Printf("\n Generating help file in HTML foramt. \n\n")
+		commands := app.GetCommandStruct()
+		fmt.Println(PrettyPrint(commands))
+
+		// TODO: Print to html
+
 		return nil
 	},
 }

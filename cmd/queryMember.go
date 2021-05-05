@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// membersCmd represents the members command
-var membersCmd = &cobra.Command{
-	Use:     "members [name]",
+// memberCmd represents the members command
+var memberCmd = &cobra.Command{
+	Use:     "member [name]",
 	Short:   "[m] Query member purchase history.",
 	Long:    `[m] Query member purchase history.`,
 	Aliases: []string{"m"},
@@ -55,5 +55,5 @@ var membersCmd = &cobra.Command{
 }
 
 func init() {
-	qCmd.AddCommand(membersCmd)
+	qCmd.AddCommand(memberCmd)
 }
